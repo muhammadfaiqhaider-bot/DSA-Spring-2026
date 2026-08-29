@@ -41,6 +41,9 @@ struct Fleet {
 #define ID_MIN 1
 #define ID_MAX 9999
 
+
 int myStrLen(const char* s);
 void myStrCopy(char* dest, const char* src);
 int myStrCompare(const char* a, const char* b);
+char* cloneCString(const char* src);
+void reportSizes();

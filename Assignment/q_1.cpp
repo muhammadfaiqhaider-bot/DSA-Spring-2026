@@ -1,4 +1,5 @@
 #include <iostream>
+#include "Q_1.h"
 using namespace std;
 
 
@@ -51,14 +52,54 @@ char* cloneCString(const char* src) {
 	*(clone + index) = '\0';
 	return clone;
 }
+
+
+void reportSizes() {
+	// for Reading 
+	int paddingReading = 0;
+	int payloadReading = 0;
+	int sizeOfReading = 0;
+
+	payloadReading = 9 * sizeof(char) + sizeof(char) + sizeof(float);
+	sizeOfReading = sizeof(Reading);
+	paddingReading = sizeOfReading - payloadReading;
+
+	
+
+	//for Probe
+	int paddingProbe = 0;
+	int payloadProbe = 0;
+	int sizeOfProbe = 0;
+
+	payloadProbe = sizeof(int) + sizeof(int) + sizeof(int) + (int)sizeof(Reading*) + (int)sizeof(char*);
+	sizeOfProbe = sizeof(Probe);
+	paddingProbe = sizeOfProbe - payloadProbe;
+
+	//for Fleet
+
+	int paddingFleet = 0;
+	int payloadFleet = 0;
+	int sizeOfFleet = 0;
+
+	payloadFleet = sizeof(int) + sizeof(int) + sizeof(Fleet**);
+	sizeOfFleet = sizeof(Fleet);
+	paddingFleet = sizeOfFleet - payloadFleet;
+
+	cout << "------------------------------------------------------" << endl;
+	cout << "Structure Name | Size of Structure | Payload | Padding" << endl;
+	cout << "------------------------------------------------------" << endl;
+	cout << "   Reading     |        " << sizeOfReading << "         |    " << payloadReading << "   |    " << paddingReading << endl;
+	cout << "   Probe       |        " << sizeOfProbe << "         |    " << payloadProbe << "   |    " << paddingProbe << endl;
+	cout << "   Fleet       |        " << sizeOfFleet << "         |    " << payloadFleet << "   |    " << paddingFleet << endl;
+
+}
 int main()
 {
 	char name[10] = { 'f','a','i','q' };
 	char name2[10] = { 'a','a','k','q' };
 
-	char* ans = cloneCString(name);
-	cout << ans << endl;
-	cout << myStrLen(ans);
+	reportSizes();
+
 
 	
 
