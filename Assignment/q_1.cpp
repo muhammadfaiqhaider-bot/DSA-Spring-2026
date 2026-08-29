@@ -108,6 +108,25 @@ void reportSizes() {
 
 
 
+void initFleet(Fleet& f, int initialCapacity) {
+	
+	if (initialCapacity < 1)initialCapacity = 1;
+	f.capacity = initialCapacity;
+	f.count = 0;
+
+	f.probes = new Probe * [initialCapacity];
+	for (int i = 0; i < initialCapacity; i++) {
+		f.probes[i] = nullptr;
+	}
+}
+
+
+
+
+
+
+
+
 int main()
 {
 	char name[10] = { 'f','a','i','q' };
