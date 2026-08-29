@@ -123,7 +123,38 @@ void initFleet(Fleet& f, int initialCapacity) {
 
 
 
+bool growFleet(Fleet& f) {
 
+	int newCapacity = 0;
+	if (f.capacity <= 0)
+		newCapacity = P1;
+	else
+		newCapacity = f.capacity * 2;
+
+	if (newCapacity > MAX_PROBES) {
+		cout << "ERR FLEET_FULL" << endl;
+		return false;
+	}
+
+
+	Probe** newProbes = new Probe * [newCapacity];
+	for (int i = 0; i < newCapacity; i++) {
+		newProbes[i] = nullptr;
+	}
+
+
+	for (int i = 0; i < f.count; i++) {
+		newProbes[i] = f.probes[i];
+	}
+
+	delete[]f.probes;
+
+	f.capacity = newCapacity;
+	f.probes = newProbes;
+
+	return true;
+	
+}
 
 
 
