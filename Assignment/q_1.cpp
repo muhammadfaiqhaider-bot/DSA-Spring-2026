@@ -158,6 +158,50 @@ bool growFleet(Fleet& f) {
 
 
 
+bool addProbe(Fleet& f, int probeId, const char* callSign) {
+
+
+	int  count = 0;
+
+
+	if (probeId < ID_MIN || probeId > ID_MAX) {
+		cout << "ERR BAD_ID" << endl;
+		return false;
+	}
+
+	count = myStrLen(callSign);
+
+	if (count < 1 || count > SIGN_LIMIT) {
+		cout << "ERR BAD_SIGN" << endl;
+		return false;
+	}
+
+	for (int i = 0; i < f.count; i++) {
+		if (f.probes[i]->probeId == probeId) {
+			cout << "ERR DUP_ID" << endl;
+			return false;
+		}
+	}
+
+	if (f.count == f.capacity) {
+		growFleet(f);
+	}
+	
+
+	Probe* pro = new Probe;
+	pro->probeId = probeId;
+	pro->callSign = cloneCString(callSign);
+	pro->readingCapacity = 0;
+	pro->readingCount = 0;
+	pro->readings = nullptr;
+
+	f.probes[f.count] = pro; 
+	f.count++;
+
+	return true;
+
+}
+
 int main()
 {
 	char name[10] = { 'f','a','i','q' };
