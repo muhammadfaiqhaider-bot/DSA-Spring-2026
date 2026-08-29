@@ -2,6 +2,8 @@
 #include "Q_1.h"
 using namespace std;
 
+//QUESTION - 01 (PART-A)
+
 
 int myStrLen(const char* s) {
 	int count = 0;
@@ -81,9 +83,13 @@ void reportSizes() {
 	int payloadFleet = 0;
 	int sizeOfFleet = 0;
 
-	payloadFleet = sizeof(int) + sizeof(int) + sizeof(Fleet**);
+	payloadFleet = sizeof(int) + sizeof(int) + sizeof(Probe**);
 	sizeOfFleet = sizeof(Fleet);
 	paddingFleet = sizeOfFleet - payloadFleet;
+
+	cout << "Size of: " << endl;
+	cout << "char: " << (int)sizeof(char) << " int: " << (int)sizeof(int)<< " float: " << (int)sizeof(float)<< " ptr: " << (int)sizeof(char*) << "\n";
+	
 
 	cout << "------------------------------------------------------" << endl;
 	cout << "Structure Name | Size of Structure | Payload | Padding" << endl;
@@ -93,6 +99,15 @@ void reportSizes() {
 	cout << "   Fleet       |        " << sizeOfFleet << "         |    " << payloadFleet << "   |    " << paddingFleet << endl;
 
 }
+
+
+
+
+
+//PART B
+
+
+
 int main()
 {
 	char name[10] = { 'f','a','i','q' };
