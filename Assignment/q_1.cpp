@@ -342,6 +342,18 @@ void destroyProbe(Probe *&p)
 	}
 }
 
+void compactFleet(Fleet &f, int removedIndex)
+{
+	if (removedIndex >= 0 && removedIndex < f.count)
+	{
+		for (int i = removedIndex; i < f.count - 1; i++)
+		{
+			f.probes[i] = f.probes[i + 1];
+		}
+		f.probes[f.count - 1] = nullptr;
+		f.count--;
+	}
+}
 int main()
 {
 	char name[10] = {'f', 'a', 'i', 'q'};
