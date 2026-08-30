@@ -303,6 +303,22 @@ Probe* findProbe(const Fleet& f, int probeId)
 	}
 	
 }
+
+float probeHealth(const Probe* p)
+{
+	float mean = 0;
+	if(p == nullptr)return 0;
+	if(p->readingCount<=0)return 0;
+
+	for(int i =0; i<p->readingCount; i++)
+	{
+		if(p->readings[i].status == 'N')mean+=1;
+		else if (p->readings[i].status == 'W')mean+=0.5;
+		else if (p->readings[i].status == 'C')mean+=0;
+	}
+	mean = mean / p->readingCount;
+	return mean;
+}
 int main()
 {
 	char name[10] = {'f', 'a', 'i', 'q'};
