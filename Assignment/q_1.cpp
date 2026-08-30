@@ -272,14 +272,16 @@ bool addReading(Probe *p, const char *sensor, float value, char status)
 	return true;
 }
 
-Probe** findSlot(const Fleet& f, int probeId)
+Probe **findSlot(const Fleet &f, int probeId)
 {
-	if(f.count<=0)return nullptr;
-	if(f.probes==nullptr)return nullptr;
+	if (f.count <= 0)
+		return nullptr;
+	if (f.probes == nullptr)
+		return nullptr;
 
-	for(int i=0; i<f.count;i++)
+	for (int i = 0; i < f.count; i++)
 	{
-		if(f.probes[i]->probeId == probeId)
+		if (f.probes[i]->probeId == probeId)
 		{
 			return &f.probes[i];
 		}
@@ -288,12 +290,11 @@ Probe** findSlot(const Fleet& f, int probeId)
 	return nullptr;
 }
 
-
-Probe* findProbe(const Fleet& f, int probeId)
+Probe *findProbe(const Fleet &f, int probeId)
 {
 	Fleet temp;
 	temp.probes = findSlot(f, probeId);
-	if(temp.probes == nullptr)
+	if (temp.probes == nullptr)
 	{
 		return nullptr;
 	}
@@ -301,24 +302,46 @@ Probe* findProbe(const Fleet& f, int probeId)
 	{
 		return *temp.probes;
 	}
-	
 }
 
-float probeHealth(const Probe* p)
+float probeHealth(const Probe *p)
 {
 	float mean = 0;
-	if(p == nullptr)return 0;
-	if(p->readingCount<=0)return 0;
+	if (p == nullptr)
+		return 0;
+	if (p->readingCount <= 0)
+		return 0;
 
-	for(int i =0; i<p->readingCount; i++)
+	for (int i = 0; i < p->readingCount; i++)
 	{
-		if(p->readings[i].status == 'N')mean+=1;
-		else if (p->readings[i].status == 'W')mean+=0.5;
-		else if (p->readings[i].status == 'C')mean+=0;
+		if (p->readings[i].status == 'N')
+			mean += 1;
+		else if (p->readings[i].status == 'W')
+			mean += 0.5;
+		else if (p->readings[i].status == 'C')
+			mean += 0;
 	}
 	mean = mean / p->readingCount;
 	return mean;
 }
+
+void destroyProbe(Probe *&p)
+{
+	if (p != nullptr)
+	{
+		delete[] p->callSign;
+
+		if (p->readingCount > 0)
+		{
+			delete[] p->readings;
+			p->readings = nullptr;
+		}
+
+		delete p;
+		p = nullptr;
+	}
+}
+
 int main()
 {
 	char name[10] = {'f', 'a', 'i', 'q'};
