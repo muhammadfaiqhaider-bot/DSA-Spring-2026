@@ -272,6 +272,37 @@ bool addReading(Probe *p, const char *sensor, float value, char status)
 	return true;
 }
 
+Probe** findSlot(const Fleet& f, int probeId)
+{
+	if(f.count<=0)return nullptr;
+	if(f.probes==nullptr)return nullptr;
+
+	for(int i=0; i<f.count;i++)
+	{
+		if(f.probes[i]->probeId == probeId)
+		{
+			return &f.probes[i];
+		}
+	}
+
+	return nullptr;
+}
+
+
+Probe* findProbe(const Fleet& f, int probeId)
+{
+	Fleet temp;
+	temp.probes = findSlot(f, probeId);
+	if(temp.probes == nullptr)
+	{
+		return nullptr;
+	}
+	else
+	{
+		return *temp.probes;
+	}
+	
+}
 int main()
 {
 	char name[10] = {'f', 'a', 'i', 'q'};
