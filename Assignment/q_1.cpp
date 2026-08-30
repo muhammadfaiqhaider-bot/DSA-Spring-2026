@@ -227,6 +227,51 @@ bool growReadings(Probe *p)
 	return true;
 }
 
+bool addReading(Probe *p, const char *sensor, float value, char status)
+{
+
+	if (p == nullptr)
+	{
+		cout << "ERR NO_PROBE" << endl;
+		return false;
+	}
+
+	if (myStrLen(sensor) < 1 || myStrLen(sensor) > SENSOR_LIMIT)
+	{
+		cout << "ERR BAD_SENSOR" << endl;
+		return false;
+	}
+
+	if (status != 'N' && status != 'W' && status != 'C')
+	{
+		cout << "ERR BAD_STATUS" << endl;
+		return false;
+	}
+
+	for (int i = 0; i < p->readingCount; i++)
+	{
+		if (!(myStrCompare(sensor, p->readings[i].sensor)))
+		{
+			cout << "ERR DUP_SENSOR." << endl;
+			return false;
+		}
+	}
+
+	if (p->readingCount == p->readingCapacity)
+	{
+		if (!growReadings(p))
+			return false;
+	}
+
+	myStrCopy(p->readings[p->readingCount].sensor, sensor);
+	p->readings[p->readingCount].value = value;
+	p->readings[p->readingCount].status = status;
+
+	p->readingCount++;
+
+	return true;
+}
+
 int main()
 {
 	char name[10] = {'f', 'a', 'i', 'q'};
