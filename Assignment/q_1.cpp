@@ -327,14 +327,27 @@ float probeHealth(const Probe *p)
 
 void printProbe(const Probe *p)
 {
+	cout << "============================================================" << endl;
 	cout << "ProbeID           Call Sign          LOGS       Health   " << endl;
 	cout << p->probeId << "          " << p->callSign << "         " << p->readingCount << "         " << probeHealth(p) << endl;
+	cout << "------------------------------------------------------------" << endl;
 	for (int i = 0; i < p->readingCount; i++)
 	{
+		cout << "Log -" << i + 1 << "  " << p->readings[i].sensor << "  " << p->readings[i].status << "  " << p->readings[i].value << endl;
 	}
 }
 
-void printFleet(const Fleet &f);
+void printFleet(const Fleet &f)
+{
+	for (int i = 0; i < f.count; i++)
+	{
+		cout << "FLEET " << char(65 + i) << endl;
+		for (int j=0; j<f.count; j++)
+		{
+			printProbe(f.probes[i]);
+		}
+	}
+}
 
 void destroyProbe(Probe *&p)
 {
@@ -414,13 +427,61 @@ void deepCopyProbe(const Probe *src, Probe *&dest)
 		}
 		else
 		{
-			temp->readings=nullptr;
+			temp->readings = nullptr;
 			temp->readingCount = 0;
 			temp->readingCapacity = 0;
 		}
 		dest = temp;
-
 	}
+}
+
+void aliasCopyProbe(Probe *src, Probe *dest)
+{
+	if (src != nullptr && dest != nullptr)
+	{
+		dest->probeId = src->probeId;
+		dest->callSign = src->callSign;
+		dest->readingCapacity = src->readingCapacity;
+		dest->readingCount = src->readingCount;
+		if (src->readingCapacity > 0)
+		{
+			for (int i = 0; i < src->readingCount; i++)
+			{
+				myStrCopy(dest->readings[i].sensor, src->readings[i].sensor);
+				dest->readings[i].status = src->readings[i].status;
+				dest->readings[i].value = src->readings[i].value;
+			}
+		}
+	}
+}
+
+void destroyFleet(Fleet &f)
+{
+	for (int i = 0; i < f.count; i++)
+	{
+		for (int j = 0; j < f.probes[i]->readingCount; j++)
+		{
+
+			delete f.probes[i]->readings[j].sensor;
+		}
+		f.probes[i]->readingCount = 0;
+		f.probes[i]->readingCapacity = 0;
+		delete[] f.probes[i]->readings;
+		delete[] f.probes[i]->callSign;
+		delete f.probes[i];
+	}
+
+	delete[] f.probes;
+
+	f.probes = nullptr;
+	f.count = 0;
+	f.capacity = 0;
+}
+
+bool addProbeByValue(Fleet f, int probeId, const char *callSign)
+{
+	addProbe(f, probeId, callSign);
+	return true;
 }
 
 int main()
@@ -428,7 +489,8 @@ int main()
 	char name[10] = {'f', 'a', 'i', 'q'};
 	char name2[10] = {'a', 'a', 'k', 'q'};
 
-	reportSizes();
+	Fleet f;
+	printFleet(f);
 
 	return 0;
 }
