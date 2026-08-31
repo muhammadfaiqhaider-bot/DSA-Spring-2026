@@ -386,7 +386,41 @@ bool removeProbe(Fleet &f, int probeId)
 	compactFleet(f, index);
 
 	return true;
+}
 
+void deepCopyProbe(const Probe *src, Probe *&dest)
+{
+
+	if (src == nullptr)
+	{
+		dest = nullptr;
+	}
+	else
+	{
+		Probe *temp = new Probe;
+		temp->probeId = src->probeId;
+		temp->callSign = cloneCString(src->callSign);
+		if (src->readingCapacity > 0)
+		{
+			temp->readings = new Reading[src->readingCapacity];
+			temp->readingCount = src->readingCount;
+			temp->readingCapacity = src->readingCapacity;
+			for (int i = 0; i < src->readingCount; i++)
+			{
+				myStrCopy(temp->readings[i].sensor, src->readings[i].sensor);
+				temp->readings[i].status = src->readings[i].status;
+				temp->readings[i].value = src->readings[i].value;
+			}
+		}
+		else
+		{
+			temp->readings=nullptr;
+			temp->readingCount = 0;
+			temp->readingCapacity = 0;
+		}
+		dest = temp;
+
+	}
 }
 
 int main()
