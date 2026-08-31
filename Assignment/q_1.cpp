@@ -325,6 +325,17 @@ float probeHealth(const Probe *p)
 	return mean;
 }
 
+void printProbe(const Probe *p)
+{
+	cout << "ProbeID           Call Sign          LOGS       Health   " << endl;
+	cout << p->probeId << "          " << p->callSign << "         " << p->readingCount << "         " << probeHealth(p) << endl;
+	for (int i = 0; i < p->readingCount; i++)
+	{
+	}
+}
+
+void printFleet(const Fleet &f);
+
 void destroyProbe(Probe *&p)
 {
 	if (p != nullptr)
@@ -354,6 +365,30 @@ void compactFleet(Fleet &f, int removedIndex)
 		f.count--;
 	}
 }
+
+bool removeProbe(Fleet &f, int probeId)
+{
+	int index = 0;
+	Probe **temp = findSlot(f, probeId);
+	if (temp == nullptr)
+	{
+		cout << "ERR NOT_FOUND" << endl;
+		return false;
+	}
+
+	for (int i = 0; i < f.count; i++)
+	{
+		if (f.probes[i]->probeId == probeId)
+			index = i;
+	}
+
+	destroyProbe(f.probes[index]);
+	compactFleet(f, index);
+
+	return true;
+
+}
+
 int main()
 {
 	char name[10] = {'f', 'a', 'i', 'q'};
