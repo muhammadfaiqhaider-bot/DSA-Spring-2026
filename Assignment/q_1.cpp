@@ -441,17 +441,9 @@ void aliasCopyProbe(Probe *src, Probe *dest)
 	{
 		dest->probeId = src->probeId;
 		dest->callSign = src->callSign;
+		dest->readings = src->readings;
 		dest->readingCapacity = src->readingCapacity;
 		dest->readingCount = src->readingCount;
-		if (src->readingCapacity > 0)
-		{
-			for (int i = 0; i < src->readingCount; i++)
-			{
-				myStrCopy(dest->readings[i].sensor, src->readings[i].sensor);
-				dest->readings[i].status = src->readings[i].status;
-				dest->readings[i].value = src->readings[i].value;
-			}
-		}
 	}
 }
 
@@ -459,16 +451,7 @@ void destroyFleet(Fleet &f)
 {
 	for (int i = 0; i < f.count; i++)
 	{
-		for (int j = 0; j < f.probes[i]->readingCount; j++)
-		{
-
-			delete f.probes[i]->readings[j].sensor;
-		}
-		f.probes[i]->readingCount = 0;
-		f.probes[i]->readingCapacity = 0;
-		delete[] f.probes[i]->readings;
-		delete[] f.probes[i]->callSign;
-		delete f.probes[i];
+		destroyProbe(f.probes[i]);
 	}
 
 	delete[] f.probes;
@@ -480,9 +463,47 @@ void destroyFleet(Fleet &f)
 
 bool addProbeByValue(Fleet f, int probeId, const char *callSign)
 {
-	addProbe(f, probeId, callSign);
+	if (probeId < ID_MIN || probeId > ID_MAX)
+	{
+		cout << "ERR BAD_ID" << endl;
+		return false;
+	}
+
+	int len = myStrLen(callSign);
+
+	if (len < 1 || len > SIGN_LIMIT)
+	{
+		cout << "ERR BAD_SIGN" << endl;
+		return false;
+	}
+
+	for (int i = 0; i < f.count; i++)
+	{
+		if (f.probes[i]->probeId == probeId)
+		{
+			cout << "ERR DUP_ID" << endl;
+			return false;
+		}
+	}
+
+	if (f.count == f.capacity)
+	{
+		growFleet(f);
+	}
+
+	Probe *pro = new Probe;
+	pro->probeId = probeId;
+	pro->callSign = cloneCString(callSign);
+	pro->readingCapacity = 0;
+	pro->readingCount = 0;
+	pro->readings = nullptr;
+
+	f.probes[f.count] = pro;
+	f.count++;
+
 	return true;
 }
+
 
 int main()
 {
