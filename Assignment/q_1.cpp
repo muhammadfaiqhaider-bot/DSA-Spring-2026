@@ -342,7 +342,7 @@ void printFleet(const Fleet &f)
 	for (int i = 0; i < f.count; i++)
 	{
 		cout << "FLEET " << char(65 + i) << endl;
-		for (int j=0; j<f.count; j++)
+		for (int j = 0; j < f.count; j++)
 		{
 			printProbe(f.probes[i]);
 		}
@@ -504,6 +504,76 @@ bool addProbeByValue(Fleet f, int probeId, const char *callSign)
 	return true;
 }
 
+bool mergeFleets(Fleet &target, const Fleet &source)
+{
+	for (int i = 0; i < source.count; i++)
+	{
+		if (!findProbe(target, source.probes[i]->probeId))
+		{
+			if (!addProbe(target, source.probes[i]->probeId, source.probes[i]->callSign))
+				return false;
+
+			Probe *newProbe = findProbe(target, source.probes[i]->probeId);
+
+			for (int j = 0; j < source.probes[i]->readingCount; j++)
+			{
+				if (!addReading(newProbe, source.probes[i]->readings[j].sensor, source.probes[i]->readings[j].value, source.probes[i]->readings[j].status))
+					return false;
+			}
+		}
+	}
+	return true;
+}
+
+void loadFleetA(Fleet &f)
+{
+	destroyFleet(f);
+	initFleet(f, P1);
+
+	char *signs[8] = {"Voyager", "Pathfinder", "Odyssey", "Horizon", "Sentinel", "Aurora", "Vanguard", "Meridian"};
+	char *senser[6] = {"TEMP-A", "PWR-BUS", "RAD-CNT", "GYRO-X", "COMMS-1", "FUEL-P"};
+	char status[3] = {'N', 'W', 'C'};
+
+	int total = (SEED % 3) + 3;
+
+	for (int i = 0; i < total; i++)
+	{
+		int id = 1000 + SEED + 11 * i;
+		addProbe(f, id, signs[(SEED + i) % 8]);
+
+		Probe *p = findProbe(f, id);
+
+		int logs = (SEED + i) % 4;
+		for (int j = 0; j < logs; j++)
+		{
+			float value = (float)(SEED + 10 * i + 3 * j) + 0.5f;
+			char st = status[(SEED + 2 * i + j) % 3];
+			addReading(p, senser[(SEED + i + j) % 6], value, st);
+		}
+	}
+}
+
+void loadFleetB(Fleet &f)
+{
+	destroyFleet(f);
+	initFleet(f, 2);
+
+	char *senser[6] = {"TEMP-A", "PWR-BUS", "RAD-CNT", "GYRO-X", "COMMS-1", "FUEL-P"};
+	char status[3] = {'N', 'W', 'C'};
+
+
+	int id1 = 1000 + SEED;
+	addProbe(f, id1, "Relay-Alpha");
+	Probe *p1 = findProbe(f, id1);
+	addReading(p1, senser[SEED % 6], (float)SEED + 0.5f, status[SEED % 3]);
+
+
+	int id2 = 8000 + SEED;
+	addProbe(f, id2, "Relay-Beta");
+	Probe *p2 = findProbe(f, id2);
+	addReading(p2, senser[(SEED + 1) % 6], (float)SEED + 20.5f, status[(SEED + 1) % 3]);
+	addReading(p2, senser[(SEED + 2) % 6], (float)SEED + 40.5f, status[(SEED + 2) % 3]);
+}
 
 int main()
 {
@@ -511,6 +581,7 @@ int main()
 	char name2[10] = {'a', 'a', 'k', 'q'};
 
 	Fleet f;
+	loadFleetB(f);
 	printFleet(f);
 
 	return 0;
