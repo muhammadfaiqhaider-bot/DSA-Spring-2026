@@ -1,10 +1,11 @@
 #include <iostream>
+#include <iomanip>
 #include "Q_1.h"
 using namespace std;
 
 // QUESTION - 01 (PART-A)
 
-int myStrLen(const char *s)
+int myStrLen(const char* s)
 {
 	int count = 0;
 	int index = 0;
@@ -16,7 +17,7 @@ int myStrLen(const char *s)
 	return count;
 }
 
-void myStrCopy(char *dest, const char *src)
+void myStrCopy(char* dest, const char* src)
 {
 	int index = 0;
 	while (*(src + index) != '\0')
@@ -27,7 +28,7 @@ void myStrCopy(char *dest, const char *src)
 	*(dest + index) = '\0';
 }
 
-int myStrCompare(const char *a, const char *b)
+int myStrCompare(const char* a, const char* b)
 {
 	int diff = 0;
 	int index = 0;
@@ -47,9 +48,9 @@ int myStrCompare(const char *a, const char *b)
 	return 0;
 }
 
-char *cloneCString(const char *src)
+char* cloneCString(const char* src)
 {
-	char *clone = new char[myStrLen(src) + 1];
+	char* clone = new char[myStrLen(src) + 1];
 	int index = 0;
 	while (*(src + index) != '\0')
 	{
@@ -76,7 +77,7 @@ void reportSizes()
 	int payloadProbe = 0;
 	int sizeOfProbe = 0;
 
-	payloadProbe = sizeof(int) + sizeof(int) + sizeof(int) + (int)sizeof(Reading *) + (int)sizeof(char *);
+	payloadProbe = sizeof(int) + sizeof(int) + sizeof(int) + (int)sizeof(Reading*) + (int)sizeof(char*);
 	sizeOfProbe = sizeof(Probe);
 	paddingProbe = sizeOfProbe - payloadProbe;
 
@@ -86,12 +87,12 @@ void reportSizes()
 	int payloadFleet = 0;
 	int sizeOfFleet = 0;
 
-	payloadFleet = sizeof(int) + sizeof(int) + sizeof(Probe **);
+	payloadFleet = sizeof(int) + sizeof(int) + sizeof(Probe**);
 	sizeOfFleet = sizeof(Fleet);
 	paddingFleet = sizeOfFleet - payloadFleet;
 
 	cout << "Size of: " << endl;
-	cout << "char: " << (int)sizeof(char) << " int: " << (int)sizeof(int) << " float: " << (int)sizeof(float) << " ptr: " << (int)sizeof(char *) << "\n";
+	cout << "char: " << (int)sizeof(char) << " int: " << (int)sizeof(int) << " float: " << (int)sizeof(float) << " ptr: " << (int)sizeof(char*) << "\n";
 
 	cout << "------------------------------------------------------" << endl;
 	cout << "Structure Name | Size of Structure | Payload | Padding" << endl;
@@ -103,7 +104,7 @@ void reportSizes()
 
 // PART B
 
-void initFleet(Fleet &f, int initialCapacity)
+void initFleet(Fleet& f, int initialCapacity)
 {
 
 	if (initialCapacity < 1)
@@ -111,14 +112,14 @@ void initFleet(Fleet &f, int initialCapacity)
 	f.capacity = initialCapacity;
 	f.count = 0;
 
-	f.probes = new Probe *[initialCapacity];
+	f.probes = new Probe * [initialCapacity];
 	for (int i = 0; i < initialCapacity; i++)
 	{
 		f.probes[i] = nullptr;
 	}
 }
 
-bool growFleet(Fleet &f)
+bool growFleet(Fleet& f)
 {
 
 	int newCapacity = 0;
@@ -133,7 +134,7 @@ bool growFleet(Fleet &f)
 		return false;
 	}
 
-	Probe **newProbes = new Probe *[newCapacity];
+	Probe** newProbes = new Probe * [newCapacity];
 	for (int i = 0; i < newCapacity; i++)
 	{
 		newProbes[i] = nullptr;
@@ -152,7 +153,7 @@ bool growFleet(Fleet &f)
 	return true;
 }
 
-bool addProbe(Fleet &f, int probeId, const char *callSign)
+bool addProbe(Fleet& f, int probeId, const char* callSign)
 {
 
 	int count = 0;
@@ -185,7 +186,7 @@ bool addProbe(Fleet &f, int probeId, const char *callSign)
 		growFleet(f);
 	}
 
-	Probe *pro = new Probe;
+	Probe* pro = new Probe;
 	pro->probeId = probeId;
 	pro->callSign = cloneCString(callSign);
 	pro->readingCapacity = 0;
@@ -198,7 +199,7 @@ bool addProbe(Fleet &f, int probeId, const char *callSign)
 	return true;
 }
 
-bool growReadings(Probe *p)
+bool growReadings(Probe* p)
 {
 
 	int newCapacity = 0;
@@ -213,7 +214,7 @@ bool growReadings(Probe *p)
 		return false;
 	}
 
-	Reading *newReading = new Reading[newCapacity];
+	Reading* newReading = new Reading[newCapacity];
 
 	for (int i = 0; i < p->readingCount; i++)
 	{
@@ -227,7 +228,7 @@ bool growReadings(Probe *p)
 	return true;
 }
 
-bool addReading(Probe *p, const char *sensor, float value, char status)
+bool addReading(Probe* p, const char* sensor, float value, char status)
 {
 
 	if (p == nullptr)
@@ -272,7 +273,7 @@ bool addReading(Probe *p, const char *sensor, float value, char status)
 	return true;
 }
 
-Probe **findSlot(const Fleet &f, int probeId)
+Probe** findSlot(const Fleet& f, int probeId)
 {
 	if (f.count <= 0)
 		return nullptr;
@@ -290,7 +291,7 @@ Probe **findSlot(const Fleet &f, int probeId)
 	return nullptr;
 }
 
-Probe *findProbe(const Fleet &f, int probeId)
+Probe* findProbe(const Fleet& f, int probeId)
 {
 	Fleet temp;
 	temp.probes = findSlot(f, probeId);
@@ -304,7 +305,7 @@ Probe *findProbe(const Fleet &f, int probeId)
 	}
 }
 
-float probeHealth(const Probe *p)
+float probeHealth(const Probe* p)
 {
 	float mean = 0;
 	if (p == nullptr)
@@ -325,31 +326,51 @@ float probeHealth(const Probe *p)
 	return mean;
 }
 
-void printProbe(const Probe *p)
+void printProbe(const Probe* p)
 {
+	cout << endl;
+	cout << "*************************************************************" << endl;
 	cout << "============================================================" << endl;
-	cout << "ProbeID           Call Sign          LOGS       Health   " << endl;
-	cout << p->probeId << "          " << p->callSign << "         " << p->readingCount << "         " << probeHealth(p) << endl;
+
+	cout << left
+		<< setw(18) << "ProbeID"
+		<< setw(20) << "Call Sign"
+		<< setw(12) << "LOGS"
+		<< setw(10) << "Health" << endl;
+
+	cout << left
+		<< setw(18) << p->probeId
+		<< setw(20) << p->callSign
+		<< setw(12) << p->readingCount
+		<< setw(10) << probeHealth(p) << endl;
+
 	cout << "------------------------------------------------------------" << endl;
+
 	for (int i = 0; i < p->readingCount; i++)
 	{
-		cout << "Log -" << i + 1 << "  " << p->readings[i].sensor << "  " << p->readings[i].status << "  " << p->readings[i].value << endl;
+		cout << left
+			<< setw(8) << "Log"
+			<< setw(4) << i + 1
+			<< setw(20) << p->readings[i].sensor
+			<< setw(8) << p->readings[i].status
+			<< setw(10) << p->readings[i].value
+			<< endl;
 	}
+	cout << "------------------------------------------------------------" << endl;
+	cout << "*************************************************************" << endl;
+	cout << endl;
+
 }
 
-void printFleet(const Fleet &f)
+void printFleet(const Fleet& f)
 {
 	for (int i = 0; i < f.count; i++)
 	{
-		cout << "FLEET " << char(65 + i) << endl;
-		for (int j = 0; j < f.count; j++)
-		{
-			printProbe(f.probes[i]);
-		}
+		printProbe(f.probes[i]);
 	}
 }
 
-void destroyProbe(Probe *&p)
+void destroyProbe(Probe*& p)
 {
 	if (p != nullptr)
 	{
@@ -366,7 +387,7 @@ void destroyProbe(Probe *&p)
 	}
 }
 
-void compactFleet(Fleet &f, int removedIndex)
+void compactFleet(Fleet& f, int removedIndex)
 {
 	if (removedIndex >= 0 && removedIndex < f.count)
 	{
@@ -379,10 +400,10 @@ void compactFleet(Fleet &f, int removedIndex)
 	}
 }
 
-bool removeProbe(Fleet &f, int probeId)
+bool removeProbe(Fleet& f, int probeId)
 {
 	int index = 0;
-	Probe **temp = findSlot(f, probeId);
+	Probe** temp = findSlot(f, probeId);
 	if (temp == nullptr)
 	{
 		cout << "ERR NOT_FOUND" << endl;
@@ -401,7 +422,7 @@ bool removeProbe(Fleet &f, int probeId)
 	return true;
 }
 
-void deepCopyProbe(const Probe *src, Probe *&dest)
+void deepCopyProbe(const Probe* src, Probe*& dest)
 {
 
 	if (src == nullptr)
@@ -410,7 +431,7 @@ void deepCopyProbe(const Probe *src, Probe *&dest)
 	}
 	else
 	{
-		Probe *temp = new Probe;
+		Probe* temp = new Probe;
 		temp->probeId = src->probeId;
 		temp->callSign = cloneCString(src->callSign);
 		if (src->readingCapacity > 0)
@@ -435,7 +456,7 @@ void deepCopyProbe(const Probe *src, Probe *&dest)
 	}
 }
 
-void aliasCopyProbe(Probe *src, Probe *dest)
+void aliasCopyProbe(Probe* src, Probe* dest)
 {
 	if (src != nullptr && dest != nullptr)
 	{
@@ -447,7 +468,7 @@ void aliasCopyProbe(Probe *src, Probe *dest)
 	}
 }
 
-void destroyFleet(Fleet &f)
+void destroyFleet(Fleet& f)
 {
 	for (int i = 0; i < f.count; i++)
 	{
@@ -461,7 +482,7 @@ void destroyFleet(Fleet &f)
 	f.capacity = 0;
 }
 
-bool addProbeByValue(Fleet f, int probeId, const char *callSign)
+bool addProbeByValue(Fleet f, int probeId, const char* callSign)
 {
 	if (probeId < ID_MIN || probeId > ID_MAX)
 	{
@@ -491,7 +512,7 @@ bool addProbeByValue(Fleet f, int probeId, const char *callSign)
 		growFleet(f);
 	}
 
-	Probe *pro = new Probe;
+	Probe* pro = new Probe;
 	pro->probeId = probeId;
 	pro->callSign = cloneCString(callSign);
 	pro->readingCapacity = 0;
@@ -504,7 +525,7 @@ bool addProbeByValue(Fleet f, int probeId, const char *callSign)
 	return true;
 }
 
-bool mergeFleets(Fleet &target, const Fleet &source)
+bool mergeFleets(Fleet& target, const Fleet& source)
 {
 	for (int i = 0; i < source.count; i++)
 	{
@@ -513,7 +534,7 @@ bool mergeFleets(Fleet &target, const Fleet &source)
 			if (!addProbe(target, source.probes[i]->probeId, source.probes[i]->callSign))
 				return false;
 
-			Probe *newProbe = findProbe(target, source.probes[i]->probeId);
+			Probe* newProbe = findProbe(target, source.probes[i]->probeId);
 
 			for (int j = 0; j < source.probes[i]->readingCount; j++)
 			{
@@ -525,14 +546,14 @@ bool mergeFleets(Fleet &target, const Fleet &source)
 	return true;
 }
 
-void loadFleetA(Fleet &f)
+void loadFleetA(Fleet& f)
 {
 	destroyFleet(f);
 	initFleet(f, P1);
 
-	char *signs[8] = {"Voyager", "Pathfinder", "Odyssey", "Horizon", "Sentinel", "Aurora", "Vanguard", "Meridian"};
-	char *senser[6] = {"TEMP-A", "PWR-BUS", "RAD-CNT", "GYRO-X", "COMMS-1", "FUEL-P"};
-	char status[3] = {'N', 'W', 'C'};
+	const char* signs[8] = { "Voyager", "Pathfinder", "Odyssey", "Horizon", "Sentinel", "Aurora", "Vanguard", "Meridian" };
+	const char* senser[6] = { "TEMP-A", "PWR-BUS", "RAD-CNT", "GYRO-X", "COMMS-1", "FUEL-P" };
+	char status[3] = { 'N', 'W', 'C' };
 
 	int total = (SEED % 3) + 3;
 
@@ -541,7 +562,7 @@ void loadFleetA(Fleet &f)
 		int id = 1000 + SEED + 11 * i;
 		addProbe(f, id, signs[(SEED + i) % 8]);
 
-		Probe *p = findProbe(f, id);
+		Probe* p = findProbe(f, id);
 
 		int logs = (SEED + i) % 4;
 		for (int j = 0; j < logs; j++)
@@ -553,36 +574,347 @@ void loadFleetA(Fleet &f)
 	}
 }
 
-void loadFleetB(Fleet &f)
+void loadFleetB(Fleet& f)
 {
 	destroyFleet(f);
 	initFleet(f, 2);
 
-	char *senser[6] = {"TEMP-A", "PWR-BUS", "RAD-CNT", "GYRO-X", "COMMS-1", "FUEL-P"};
-	char status[3] = {'N', 'W', 'C'};
+	const char* senser[6] = { "TEMP-A", "PWR-BUS", "RAD-CNT", "GYRO-X", "COMMS-1", "FUEL-P" };
+	char status[3] = { 'N', 'W', 'C' };
 
 
 	int id1 = 1000 + SEED;
 	addProbe(f, id1, "Relay-Alpha");
-	Probe *p1 = findProbe(f, id1);
+	Probe* p1 = findProbe(f, id1);
 	addReading(p1, senser[SEED % 6], (float)SEED + 0.5f, status[SEED % 3]);
 
 
 	int id2 = 8000 + SEED;
 	addProbe(f, id2, "Relay-Beta");
-	Probe *p2 = findProbe(f, id2);
+	Probe* p2 = findProbe(f, id2);
 	addReading(p2, senser[(SEED + 1) % 6], (float)SEED + 20.5f, status[(SEED + 1) % 3]);
 	addReading(p2, senser[(SEED + 2) % 6], (float)SEED + 40.5f, status[(SEED + 2) % 3]);
 }
 
+
+
 int main()
 {
-	char name[10] = {'f', 'a', 'i', 'q'};
-	char name2[10] = {'a', 'a', 'k', 'q'};
+	cout << "-------------------------------------------" << endl;
+	cout << "      MISSION CONTROL SYSTEM  " << endl;
+	cout << "-------------------------------------------" << endl << endl;
 
-	Fleet f;
-	loadFleetB(f);
-	printFleet(f);
+	cout << "NAME : MUHAMMAD FAIQ HAIDER" << endl;
+	cout << "ROLL NUMBER : " << ROLL_N << " P1=" << P1 << " P2=" << P2 << " P3=" << P3 << endl;
+
+	Fleet A, B;
+	initFleet(A, P1);
+	initFleet(B, 2);
+	Probe* clone = nullptr;
+
+
+	cout << "-------------------------------------------" << endl;
+	cout << " MISSION CONTROL - COMMAND GUIDE" << endl;
+	cout << "-------------------------------------------" << endl;
+	cout << " 0  EXIT" << endl;
+	cout << " 1  ADD          -> 1 <id> <callSign>" << endl;
+	cout << " 2  LOG          -> 2 <id> <sensor> <value> <status>" << endl;
+	cout << " 3  REMOVE       -> 3 <id>" << endl;
+	cout << " 4  FIND         -> 4 <id>" << endl;
+	cout << " 5  PRINT_A      -> 5" << endl;
+	cout << " 6  GROW         -> 6" << endl;
+	cout << " 7  ADD_BYVAL    -> 7 <id> <callSign>" << endl;
+	cout << " 8  CLONE        -> 8 <id>" << endl;
+	cout << " 9  PRINT_CLONE  -> 9" << endl;
+	cout << "10  ALIAS        -> 10 <id>" << endl;
+	cout << "11  SEED_A       -> 11" << endl;
+	cout << "12  SEED_B       -> 12" << endl;
+	cout << "13  PRINT_B      -> 13" << endl;
+	cout << "14  MERGE_B      -> 14" << endl;
+	cout << "15  MERGE_SELF   -> 15" << endl;
+	cout << "16  DESTROY      -> 16" << endl;
+	cout << "17  SIZES        -> 17" << endl;
+	cout << "-------------------------------------------" << endl;
+	cout << "-------------------------------------------" << endl;
+
+	int cmd;
+	do
+	{
+		system("cls");
+
+		cout << "-------------------------------------------" << endl;
+		cout << " MISSION CONTROL - COMMAND GUIDE" << endl;
+		cout << "-------------------------------------------" << endl;
+		cout << " 0  EXIT" << endl;
+		cout << " 1  ADD PROBE (manually) " << endl;
+		cout << " 2  ADD LOGs for exsisting Probe " << endl;
+		cout << " 3  REMOVE probe by ID " << endl;
+		cout << " 4  FIND probe by ID " << endl;
+		cout << " 5  PRINT Fleet A " << endl;
+		cout << " 6  GROW Fleet Size " << endl;
+		cout << " 7  Add PROBE by Value " << endl;
+		cout << " 8  CLONE/COPY Probe " << endl;
+		cout << " 9  PRINT CLONED PROBE " << endl;
+		cout << "10  ALIAS Probe" << endl;
+		cout << "11  SEED-A     " << endl;
+		cout << "12  SEED-B      " << endl;
+		cout << "13  PRINT Fleet B" << endl;
+		cout << "14  MERGE Fleet B to Fleet A" << endl;
+		cout << "15  MERGE Fleet A to Fleet A " << endl;
+		cout << "16  DESTROY Fleet     " << endl;
+		cout << "17  Sizes" << endl;
+		cout << "-------------------------------------------" << endl;
+
+		cin >> cmd;
+
+		if (cmd == 0)
+			break;
+
+		switch (cmd)
+		{
+		case 1:
+		{
+			system("cls");
+			int id;
+			char nameofprobe[20];
+			cout << "Enter ID of Probe ( 1 - 9999 ) : ";
+
+			cin >> id;
+			cout << "Enter name of the probe : ";
+			cin >> nameofprobe;
+
+			if (addProbe(A, id, nameofprobe))
+				cout << "Probe ADDED successfully!! " << endl;
+
+			break;
+		}
+		case 2:
+		{
+			int id;
+			char sensor[30];
+			float value;
+			char status;
+			cout << "Enter ID of Sensor : ";
+			cin >> id;
+			cout << "Enter name of Sensor: ";
+			cin >> sensor;
+			cout << "Enter value of Sensor: ";
+			cin >> value;
+			cout << "Enter Status of Sensor (N/W/C) ";
+			cin >> status;
+
+			Probe* p = findProbe(A, id);
+			if (p == nullptr)
+			{
+				cout << "ERR NOT_FOUND" << endl;
+			}
+			else
+			{
+				if (addReading(p, sensor, value, status))
+					cout << "OK LOG_ADDED " << id << " " << sensor << " " << value << " " << status << endl;
+			}
+			break;
+		}
+		case 3:
+		{
+			int id;
+			cout << "Enter Id of Probe You want to remove : ";
+			cin >> id;
+			if (removeProbe(A, id))
+				cout << "OK PROBE_REMOVED " << id << endl;
+			break;
+		}
+		case 4:
+		{
+			int id;
+			cout << "Enter the ID of probe you want to find : ";
+			cin >> id;
+			Probe* p = findProbe(A, id);
+			if (p == nullptr)
+			{
+				cout << "ERR NOT_FOUND" << endl;
+			}
+			else
+			{
+				cout << "OK FOUND " << id << endl;
+				printProbe(p);
+			}
+			break;
+		}
+		case 5:
+		{
+			cout << "Fleet A : " << endl;
+			printFleet(A);
+			break;
+		}
+		case 6:
+		{
+			if (growFleet(A))
+				cout << "OK FLEET_GROWN capacity=" << A.capacity << endl;
+			break;
+		}
+		case 7:
+		{
+			int id;
+			char buf[30];
+			cout << "Enter the ID of the Probe: ";
+			cin >> id;
+			cout << "Enter the Name of the Probe: ";
+			cin >> buf;
+
+			cout << "Probe pre count: " << A.count << " capacity: " << A.capacity << endl;
+			bool result = addProbeByValue(A, id, buf);
+			cout << "By value Resturned Status: ";
+			if (result)
+			{
+				cout << result << endl;
+				cout << "Successfully added probe by value " << endl;;
+			}
+			else
+			{
+				cout << result << endl;;
+			}
+			cout << "Post count: " << A.count << " capacity: " << A.capacity << endl;
+			break;
+		}
+		case 8:
+		{
+			cout << "Enter ID of probe you want to clone: ";
+			int id;
+			cin >> id;
+			Probe* p = findProbe(A, id);
+			if (p == nullptr)
+			{
+				cout << "ERR NOT_FOUND" << endl;
+			}
+			else
+			{
+				destroyProbe(clone);
+				deepCopyProbe(p, clone);
+				cout << "OK CLONED " << id << endl;
+			}
+			break;
+		}
+		case 9:
+		{
+			if (clone == nullptr)
+			{
+				cout << "ERR NO_CLONE" << endl;
+			}
+			else
+			{
+				cout << "CLONE:" << endl;
+				printProbe(clone);
+			}
+			break;
+		}
+		case 10:
+		{
+			cout << "Enter the ID of Probe you want to do Alias of : ";
+			int id;
+			cin >> id;
+			Probe* found = findProbe(A, id);
+			if (found == nullptr)
+			{
+				cout << "ERR NOT_FOUND" << endl;
+			}
+			else
+			{
+				Probe dummyPro;
+				dummyPro.probeId = 0;
+				dummyPro.callSign = nullptr;
+				dummyPro.readings = nullptr;
+				dummyPro.readingCount = 0;
+				dummyPro.readingCapacity = 0;
+
+				aliasCopyProbe(found, &dummyPro);
+
+				int sameName = (dummyPro.callSign == found->callSign);
+				int sameReadings = (dummyPro.readings == found->readings);
+				cout << "Status Indicator 1 (same) and 0 (different)" << endl;
+
+				cout << "Alias Probe name : " << sameName << " Logs/Readings : " << sameReadings << endl;
+
+				if (dummyPro.callSign != nullptr && myStrLen(dummyPro.callSign) > 0)
+					dummyPro.callSign[0] = 'Z';
+
+				char st;
+				if (dummyPro.readings != nullptr && dummyPro.readingCount > 0)
+				{
+					dummyPro.readings[0].status = 'C';
+					st = found->readings[0].status;
+				}
+				else
+				{
+					st = '-';
+				}
+
+				cout << "ALIAS after sign : " << found->callSign << " log " << st << endl;
+			}
+			break;
+		}
+		case 11:
+		{
+			loadFleetA(A);
+			cout << "SEED Fleet A count: " << A.count << endl;
+			break;
+		}
+		case 12:
+		{
+			loadFleetB(B);
+			cout << "SEED Fleet B count: " << B.count << endl;
+			break;
+		}
+		case 13:
+		{
+			cout << "B:" << endl;
+			printFleet(B);
+			break;
+		}
+		case 14: // MERGE_B
+		{
+			int before = A.count;
+			if (mergeFleets(A, B))
+			{
+				int added = A.count - before;
+				cout << "OK MERGED added=" << added << " count=" << A.count
+					<< " capacity=" << A.capacity << endl;
+			}
+			else
+			{
+				cout << "ERR MERGE_FAILED" << endl;
+			}
+			break;
+		}
+		case 15: // MERGE_SELF
+		{
+			mergeFleets(A, A);
+			break;
+		}
+		case 16: // DESTROY
+		{
+			destroyFleet(A);
+			cout << "OK FLEET_DESTROYED" << endl;
+			break;
+		}
+		case 17: // SIZES
+		{
+			reportSizes();
+			break;
+		}
+		default:
+			cout << "ERR BAD_CMD" << endl;
+		}
+
+		system("pause");
+
+	} while (true);
+
+	if (clone != nullptr)
+		destroyProbe(clone);
+	destroyFleet(A);
+	destroyFleet(B);
+	cout << "BYE" << endl;
 
 	return 0;
 }
