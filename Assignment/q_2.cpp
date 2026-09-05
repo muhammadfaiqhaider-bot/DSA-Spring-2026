@@ -148,6 +148,70 @@ bool growDay(DaySchedule &d)
     return true;
 }
 
+bool bookAppointment(Week& w, int day, int clientId, const char* name, const char* service, float price)
+{
+    if (w.days == nullptr)
+    {
+        cout << "ERR WEEK_DESTROYED" << endl;
+        return false;
+    }
+
+    if (day < 0 || day >= DAYS_IN_WEEK)
+    {
+        cout << "ERR BAD_DAY" << endl;
+        return false;
+    }
+
+    if (clientId < CLIENT_MIN || clientId > CLIENT_MAX)
+    {
+        cout << "ERR BAD_CLIENT" << endl;
+        return false;
+    }
+
+    if (myStrLen(name) < 1 || myStrLen(name) > NAME_LIMIT)
+    {
+        cout << "ERR BAD_NAME" << endl;
+        return false;
+    }
+
+    if (myStrLen(service) < 1 || myStrLen(service) > SERVICE_LIMIT)
+    {
+        cout << "ERR BAD_SERVICE" << endl;
+        return false;
+    }
+
+    if (price < 100.0f || price > 20000.0f)
+    {
+        cout << "ERR BAD_PRICE" << endl;
+        return false;
+    }
+
+    for (int i = 0; i < w.days[day].count; i++)
+    {
+        if (w.days[day].slots[i].clientId == clientId)
+        {
+            cout << "ERR DUP_BOOKING" << endl;
+            return false;
+        }
+    }
+
+    if (w.days[day].count == w.days[day].capacity)
+    {
+        if (!growDay(w.days[day]))
+            return false;
+    }
+
+    int idx = w.days[day].count;
+    w.days[day].slots[idx].clientId = clientId;
+    w.days[day].slots[idx].clientName = cloneCString(name);
+    myStrCopy(w.days[day].slots[idx].service, service);
+    w.days[day].slots[idx].price = price;
+
+    w.days[day].count++;
+
+    return true;
+}
+
 int main()
 {
     float sum[5] = {1, 2, 3, 4, 5};
