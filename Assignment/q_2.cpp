@@ -13,17 +13,30 @@ void fillPrices(float *begin, float *end, int n)
 float sumRange(const float *begin, const float *end)
 {
     float sum = 0;
-    for (int i = 0; begin < end; i++)
+    for (int i = 0; begin + i < end; i++)
     {
         sum += *(begin + i);
-        begin++;
     }
     return sum;
 }
+float *maxElementPtr(float *begin, float *end)
+{
+    if (begin == end)
+        return nullptr;
 
+    float *maxElem = begin;
+
+    for (int i = 0; begin + i < end; i++)
+    {
+        if (*(begin + i) > *maxElem)
+            maxElem = begin + i;
+    }
+
+    return maxElem;
+}
 int main()
 {
-    float sum [5] = {1,2,3,4,5};
+    float sum[5] = {1, 2, 3, 4, 5};
     cout << sumRange(&sum[0], &sum[4]);
     return 0;
 }
