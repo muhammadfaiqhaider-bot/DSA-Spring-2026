@@ -1,5 +1,6 @@
 #include <iostream>
 #include "q_2.h"
+#include "q_1.h"
 using namespace std;
 
 void fillPrices(float *begin, float *end, int n)
@@ -62,47 +63,89 @@ void reverseInPlace(float *begin, float *end)
     }
 }
 
-
 void reportSizes()
 {
-	// for Appointment
-	int paddingAppointment = 0;
-	int payloadAppointment = 0;
-	int sizeOfAppointment = 0;
+    // for Appointment
+    int paddingAppointment = 0;
+    int payloadAppointment = 0;
+    int sizeOfAppointment = 0;
 
-	payloadAppointment = sizeof(int) + sizeof(char*) + 9 * sizeof(char) + sizeof(float);
-	sizeOfAppointment = sizeof(Appointment);
-	paddingAppointment = sizeOfAppointment - payloadAppointment;
+    payloadAppointment = sizeof(int) + sizeof(char *) + 9 * sizeof(char) + sizeof(float);
+    sizeOfAppointment = sizeof(Appointment);
+    paddingAppointment = sizeOfAppointment - payloadAppointment;
 
-	// for DaySchedule
-	int paddingDaySchedule = 0;
-	int payloadDaySchedule = 0;
-	int sizeOfDaySchedule = 0;
+    // for DaySchedule
+    int paddingDaySchedule = 0;
+    int payloadDaySchedule = 0;
+    int sizeOfDaySchedule = 0;
 
-	payloadDaySchedule = sizeof(Appointment*) + sizeof(int) + sizeof(int);
-	sizeOfDaySchedule = sizeof(DaySchedule);
-	paddingDaySchedule = sizeOfDaySchedule - payloadDaySchedule;
+    payloadDaySchedule = sizeof(Appointment *) + sizeof(int) + sizeof(int);
+    sizeOfDaySchedule = sizeof(DaySchedule);
+    paddingDaySchedule = sizeOfDaySchedule - payloadDaySchedule;
 
-	// for Week
-	int paddingWeek = 0;
-	int payloadWeek = 0;
-	int sizeOfWeek = 0;
+    // for Week
+    int paddingWeek = 0;
+    int payloadWeek = 0;
+    int sizeOfWeek = 0;
 
-	payloadWeek = sizeof(DaySchedule*) + sizeof(int);
-	sizeOfWeek = sizeof(Week);
-	paddingWeek = sizeOfWeek - payloadWeek;
+    payloadWeek = sizeof(DaySchedule *) + sizeof(int);
+    sizeOfWeek = sizeof(Week);
+    paddingWeek = sizeOfWeek - payloadWeek;
 
-	cout << "SIZEOF Appointment=" << sizeOfAppointment
-	     << " payload=" << payloadAppointment
-	     << " padding=" << paddingAppointment << "\n";
+    cout << "------------------------------------------------------" << endl;
+    cout << "Structure Name | Size of Structure | Payload | Padding" << endl;
+    cout << "------------------------------------------------------" << endl;
+    cout << "  Appointment  |        " << sizeOfAppointment << "         |    " << payloadAppointment << "   |    " << paddingAppointment << endl;
+    cout << "  DaySchedule  |        " << sizeOfDaySchedule << "         |    " << payloadDaySchedule << "   |    " << paddingDaySchedule << endl;
+    cout << "  Week         |        " << sizeOfWeek << "         |    " << payloadWeek << "   |    " << paddingWeek << endl;
+}
 
-	cout << "SIZEOF DaySchedule=" << sizeOfDaySchedule
-	     << " payload=" << payloadDaySchedule
-	     << " padding=" << paddingDaySchedule << "\n";
+void initWeek(Week &w)
+{
+    w.dayCount = DAYS_IN_WEEK;
+    w.days = new DaySchedule[DAYS_IN_WEEK];
+    for (int i = 0; i < w.dayCount; i++)
+    {
+        w.days[i].slots = nullptr;
+        w.days[i].count = 0;
+        w.days[i].capacity = 0;
+    }
+}
 
-	cout << "SIZEOF Week=" << sizeOfWeek
-	     << " payload=" << payloadWeek
-	     << " padding=" << paddingWeek << "\n";
+bool growDay(DaySchedule &d)
+{
+    int newCapacity = 0;
+    if (d.capacity == 0)
+    {
+        newCapacity = P2;
+    }
+    else
+    {
+        newCapacity = P3 + d.capacity;
+    }
+
+    if (newCapacity > MAX_SLOTS)
+    {
+        cout << "ERR DAY_FULL" << endl;
+        return false;
+    }
+
+    Appointment *temp = new Appointment[newCapacity];
+
+    for (int i = 0; i < d.count; i++)
+    {
+        temp[i].clientId = d.slots[i].clientId;
+        myStrCopy(temp[i].service, d.slots[i].service);
+        temp[i].price = d.slots[i].price;
+        temp[i].clientName = d.slots[i].clientName;
+    }
+
+    delete[] d.slots;
+
+    d.slots = temp;
+    d.capacity = newCapacity;
+
+    return true;
 }
 
 int main()
