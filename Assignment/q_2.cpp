@@ -34,6 +34,17 @@ float *maxElementPtr(float *begin, float *end)
 
     return maxElem;
 }
+
+int countAbove(const float* begin, const float* end, float threshold)
+{
+    int count  = 0;
+    
+    for (int i =0; begin + i<end; i++)
+    {
+        if(*(begin+i)>threshold)count++;
+    }
+    return count;
+}
 int main()
 {
     float sum[5] = {1, 2, 3, 4, 5};
