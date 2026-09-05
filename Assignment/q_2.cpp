@@ -1,19 +1,29 @@
 #include <iostream>
 using namespace std;
 
-
-void fillPrices(float* begin, float* end, int n)
+void fillPrices(float *begin, float *end, int n)
 {
-    for (int i = 0 ; begin<end; i++)
+    for (int i = 0; begin < end; i++)
     {
         *begin = float((n + 613 * i) % 4000) / 2.0f + 250.0f;
         begin++;
     }
 }
 
-int  main ()
+float sumRange(const float *begin, const float *end)
 {
+    float sum = 0;
+    for (int i = 0; begin < end; i++)
+    {
+        sum += *(begin + i);
+        begin++;
+    }
+    return sum;
+}
 
-
+int main()
+{
+    float sum [5] = {1,2,3,4,5};
+    cout << sumRange(&sum[0], &sum[4]);
     return 0;
 }
