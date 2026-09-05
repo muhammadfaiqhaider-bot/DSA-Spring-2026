@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include "q_2.h"
 #include "q_1.h"
 using namespace std;
@@ -210,6 +211,178 @@ bool bookAppointment(Week& w, int day, int clientId, const char* name, const cha
     w.days[day].count++;
 
     return true;
+}
+
+bool cancelAppointment(Week& w, int day, int slot)
+{
+    if (w.days == nullptr)
+    {
+        cout << "ERR WEEK_DESTROYED" << endl;
+        return false;
+    }
+
+    if (day < 0 || day >= DAYS_IN_WEEK)
+    {
+        cout << "ERR BAD_DAY" << endl;
+        return false;
+    }
+
+    if (slot < 0 || slot >= w.days[day].count)
+    {
+        cout << "ERR BAD_SLOT" << endl;
+        return false;
+    }
+
+    delete[] w.days[day].slots[slot].clientName;
+
+    for (int i = slot; i < w.days[day].count - 1; i++)
+    {
+        w.days[day].slots[i] = w.days[day].slots[i + 1];
+    }
+
+    w.days[day].count--;
+
+    return true;
+}
+
+Appointment* findAppointment(const Week& w, int clientId, int& outDay, int& outSlot)
+{
+    if (w.days == nullptr)
+    {
+        outDay = -1;
+        outSlot = -1;
+        return nullptr;
+    }
+
+    for (int d = 0; d < w.dayCount; d++)
+    {
+        for (int s = 0; s < w.days[d].count; s++)
+        {
+            if (w.days[d].slots[s].clientId == clientId)
+            {
+                outDay = d;
+                outSlot = s;
+                return &w.days[d].slots[s];
+            }
+        }
+    }
+
+    outDay = -1;
+    outSlot = -1;
+    return nullptr;
+}
+
+float dayRevenue(const DaySchedule& d)
+{
+    float total = 0;
+    for (int i = 0; i < d.count; i++)
+    {
+        total += d.slots[i].price;
+    }
+    return total;
+}
+
+void printDay(const DaySchedule& d, int dayIndex)
+{
+	const char* dayNames[7] = { "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN" };
+
+	cout << endl;
+	cout << "*************************************************************" << endl;
+	cout << "============================================================" << endl;
+
+	cout << left
+		<< setw(8) << "DAY"
+		<< setw(8) << dayIndex
+		<< setw(8) << dayNames[dayIndex]
+		<< setw(15) << "BOOKED"
+		<< setw(15) << "REVENUE" << endl;
+
+	cout << left
+		<< setw(8) << ""
+		<< setw(8) << ""
+		<< setw(8) << ""
+		<< setw(15) << (to_string(d.count) + "/" + to_string(d.capacity))
+		<< setw(15) << dayRevenue(d) << endl;
+
+	cout << "------------------------------------------------------------" << endl;
+
+	if (d.count == 0)
+	{
+		cout << "  (free)" << endl;
+	}
+	else
+	{
+		cout << left
+			<< setw(8) << "Slot"
+			<< setw(8) << "ID"
+			<< setw(20) << "Client Name"
+			<< setw(20) << "Service"
+			<< setw(10) << "Price" << endl;
+
+		cout << "------------------------------------------------------------" << endl;
+
+		for (int i = 0; i < d.count; i++)
+		{
+			cout << left
+				<< setw(8) << i
+				<< setw(8) << d.slots[i].clientId
+				<< setw(20) << d.slots[i].clientName
+				<< setw(20) << d.slots[i].service
+				<< setw(10) << d.slots[i].price
+				<< endl;
+		}
+	}
+
+	cout << "------------------------------------------------------------" << endl;
+	cout << "*************************************************************" << endl;
+	cout << endl;
+}
+
+
+void printWeek(const Week& w)
+{
+	if (w.days == nullptr)
+	{
+		cout << endl;
+		cout << "WEEK bookings=0 revenue=0.00" << endl;
+		cout << " (destroyed)" << endl;
+		cout << "END WEEK" << endl;
+		return;
+	}
+
+	int totalBookings = 0;
+	float totalRevenue = 0;
+
+	for (int i = 0; i < w.dayCount; i++)
+	{
+		totalBookings += w.days[i].count;
+		totalRevenue += dayRevenue(w.days[i]);
+	}
+
+	cout << endl;
+	cout << "*************************************************************" << endl;
+	cout << "============================================================" << endl;
+
+	cout << left
+		<< setw(20) << "WEEK"
+		<< setw(20) << "BOOKINGS"
+		<< setw(20) << "REVENUE" << endl;
+
+	cout << left
+		<< setw(20) << ""
+		<< setw(20) << totalBookings
+		<< setw(20) << totalRevenue << endl;
+
+	cout << "------------------------------------------------------------" << endl;
+
+	for (int i = 0; i < w.dayCount; i++)
+	{
+		printDay(w.days[i], i);
+	}
+
+	cout << "END WEEK" << endl;
+	cout << "*************************************************************" << endl;
+	cout << endl;
 }
 
 int main()
