@@ -385,6 +385,227 @@ void printWeek(const Week& w)
 	cout << endl;
 }
 
+bool moveAppointment(Week& w, int fromDay, int fromSlot, int toDay)
+{
+    if (w.days == nullptr)
+    {
+        cout << "ERR WEEK_DESTROYED" << endl;
+        return false;
+    }
+
+    if (fromDay < 0 || fromDay >= DAYS_IN_WEEK || toDay < 0 || toDay >= DAYS_IN_WEEK)
+    {
+        cout << "ERR BAD_DAY" << endl;
+        return false;
+    }
+
+    if (fromDay == toDay)
+    {
+        cout << "ERR SAME_DAY" << endl;
+        return false;
+    }
+
+    if (fromSlot < 0 || fromSlot >= w.days[fromDay].count)
+    {
+        cout << "ERR BAD_SLOT" << endl;
+        return false;
+    }
+
+    int movingClientId = w.days[fromDay].slots[fromSlot].clientId;
+
+    for (int i = 0; i < w.days[toDay].count; i++)
+    {
+        if (w.days[toDay].slots[i].clientId == movingClientId)
+        {
+            cout << "ERR DUP_BOOKING" << endl;
+            return false;
+        }
+    }
+
+    if (w.days[toDay].count == w.days[toDay].capacity)
+    {
+        if (!growDay(w.days[toDay]))
+            return false;
+    }
+
+    Appointment moving = w.days[fromDay].slots[fromSlot];
+    w.days[toDay].slots[w.days[toDay].count] = moving;
+    w.days[toDay].count++;
+
+    for (int i = fromSlot; i < w.days[fromDay].count - 1; i++)
+    {
+        w.days[fromDay].slots[i] = w.days[fromDay].slots[i + 1];
+    }
+    w.days[fromDay].count--;
+
+    return true;
+}
+
+Appointment** buildIndex(const Week& w, int& outCount)
+{
+    if (w.days == nullptr)
+    {
+        outCount = 0;
+        return nullptr;
+    }
+
+    int total = 0;
+    for (int d = 0; d < w.dayCount; d++)
+        total += w.days[d].count;
+
+    if (total == 0)
+    {
+        outCount = 0;
+        return nullptr;
+    }
+
+    Appointment** index = new Appointment*[total];
+    int idx = 0;
+    for (int d = 0; d < w.dayCount; d++)
+    {
+        for (int s = 0; s < w.days[d].count; s++)
+        {
+            index[idx] = &w.days[d].slots[s];
+            idx++;
+        }
+    }
+
+    outCount = total;
+    return index;
+}
+
+void sortIndexByPrice(Appointment** index, int n)
+{
+    if (index == nullptr)
+        return;
+
+    for (int i = 0; i < n - 1; i++)
+    {
+        for (int j = 0; j < n - 1 - i; j++)
+        {
+            if (index[j]->price < index[j + 1]->price)
+            {
+                Appointment* temp = index[j];
+                index[j] = index[j + 1];
+                index[j + 1] = temp;
+            }
+        }
+    }
+}
+
+void printIndex(Appointment** index, int n)
+{
+    cout << "INDEX size=" << n << endl;
+
+    if (index == nullptr || n == 0)
+    {
+        cout << " (none)" << endl;
+    }
+    else
+    {
+        for (int i = 0; i < n; i++)
+        {
+            cout << " [" << (i < 10 ? "0" : "") << i << "] "
+                 << (index[i]->clientId < 10 ? "000" : index[i]->clientId < 100 ? "00" : index[i]->clientId < 1000 ? "0" : "")
+                 << index[i]->clientId << " "
+                 << index[i]->clientName << " "
+                 << index[i]->service << " PKR "
+                 << index[i]->price << endl;
+        }
+    }
+
+    cout << "END INDEX" << endl;
+}
+
+void destroyIndex(Appointment**& index, int& n)
+{
+    delete[] index;
+    index = nullptr;
+    n = 0;
+}
+
+void destroyWeek(Week& w)
+{
+    if (w.days != nullptr)
+    {
+        for (int d = 0; d < w.dayCount; d++)
+        {
+            for (int s = 0; s < w.days[d].count; s++)
+            {
+                delete[] w.days[d].slots[s].clientName;
+            }
+            delete[] w.days[d].slots;
+        }
+        delete[] w.days;
+    }
+
+    w.days = nullptr;
+    w.dayCount = 0;
+}
+
+bool bookByValue(DaySchedule day, int clientId, const char* name, const char* service, float price)
+{
+    for (int i = 0; i < day.count; i++)
+    {
+        if (day.slots[i].clientId == clientId)
+        {
+            cout << "ERR DUP_BOOKING" << endl;
+            return false;
+        }
+    }
+
+    if (day.count == day.capacity)
+    {
+        if (!growDay(day))
+            return false;
+    }
+
+    int idx = day.count;
+    day.slots[idx].clientId = clientId;
+    day.slots[idx].clientName = cloneCString(name);
+    myStrCopy(day.slots[idx].service, service);
+    day.slots[idx].price = price;
+
+    day.count++;
+
+    return true;
+}
+
+void loadSeedWeek(Week& w)
+{
+    destroyWeek(w);
+    initWeek(w);
+
+    const char* names[8] = {"Ayesha", "Hina", "Sana", "Mahnoor", "Zara", "Iqra", "Nimra", "Rabia"};
+    const char* services[6] = {"HAIRCUT", "FACIAL", "MANI", "PEDI", "COLOR", "MAKEUP"};
+    float prices[6] = {1500.0f, 2500.0f, 800.0f, 4200.0f, 1200.0f, 3000.0f};
+
+    int total = (SEED % 3) + 9;
+
+    for (int k = 0; k < total; k++)
+    {
+        int day = 5 + (k % 2);
+        int clientId = 500 + SEED + 7 * k;
+        const char* name = names[(SEED + k) % 8];
+        int which = (SEED + k) % 6;
+        const char* service = services[which];
+        float price = prices[which];
+
+        bookAppointment(w, day, clientId, name, service, price);
+    }
+
+    int day = SEED % 5;
+    int clientId = 500 + SEED + 7 * total;
+    const char* name = names[(SEED + total) % 8];
+    int which = (SEED + total) % 6;
+    const char* service = services[which];
+    float price = prices[which];
+
+    bookAppointment(w, day, clientId, name, service, price);
+}
+
+
+
 int main()
 {
     float sum[5] = {1, 2, 3, 4, 5};
@@ -395,3 +616,5 @@ int main()
     }
     return 0;
 }
+
+
