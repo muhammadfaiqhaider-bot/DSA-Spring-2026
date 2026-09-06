@@ -606,15 +606,281 @@ void loadSeedWeek(Week& w)
 
 
 
+
+
 int main()
 {
-    float sum[5] = {1, 2, 3, 4, 5};
-    reverseInPlace(&sum[0], &sum[4]);
-    for (int i = 0; i < 5; i++)
-    {
-        cout << sum[i] << " ";
-    }
-    return 0;
+	cout << "-------------------------------------------" << endl;
+	cout << "      GLOW & GRACE SALON SYSTEM  " << endl;
+	cout << "-------------------------------------------" << endl << endl;
+
+	cout << "NAME : MUHAMMAD FAIQ HAIDER" << endl;
+	cout << "ROLL NUMBER : " << ROLL_N << " P2=" << P2 << " P3=" << P3 << endl;
+
+	Week w;
+	initWeek(w);
+	Appointment** index = nullptr;
+	int indexCount = 0;
+
+	int cmd;
+	do
+	{
+		system("cls");
+
+		cout << "-------------------------------------------" << endl;
+		cout << " GLOW & GRACE - COMMAND GUIDE" << endl;
+		cout << "-------------------------------------------" << endl;
+		cout << " 0  EXIT" << endl;
+		cout << " 1  BOOK a new appointment" << endl;
+		cout << " 2  CANCEL an appointment" << endl;
+		cout << " 3  PRINT a single day" << endl;
+		cout << " 4  PRINT the whole week" << endl;
+		cout << " 5  MOVE an appointment between days" << endl;
+		cout << " 6  BUILD price index" << endl;
+		cout << " 7  PRINT price index" << endl;
+		cout << " 8  SORT price index" << endl;
+		cout << " 9  DROP price index" << endl;
+		cout << "10  FIND appointment by client ID" << endl;
+		cout << "11  SEED the week with sample data" << endl;
+		cout << "12  BOOK an appointment BY VALUE" << endl;
+		cout << "13  DESTROY the week" << endl;
+		cout << "14  UTILS (sizes + price utilities)" << endl;
+		cout << "-------------------------------------------" << endl;
+
+		cin >> cmd;
+
+		if (cmd == 0)
+			break;
+
+		switch (cmd)
+		{
+		case 1: // BOOK
+		{
+			int day, clientId;
+			char name[30], service[30];
+			float price;
+
+			cout << "Enter Day (0-6): ";
+			cin >> day;
+			cout << "Enter Client ID: ";
+			cin >> clientId;
+			cout << "Enter Client Name: ";
+			cin >> name;
+			cout << "Enter Service: ";
+			cin >> service;
+			cout << "Enter Price: ";
+			cin >> price;
+
+			if (index != nullptr)
+				destroyIndex(index, indexCount);
+
+			if (bookAppointment(w, day, clientId, name, service, price))
+				cout << "OK BOOKED d" << day << " "
+				     << (clientId < 10 ? "000" : clientId < 100 ? "00" : clientId < 1000 ? "0" : "")
+				     << clientId << endl;
+
+			break;
+		}
+		case 2: // CANCEL
+		{
+			int day, slot;
+			cout << "Enter Day (0-6): ";
+			cin >> day;
+			cout << "Enter Slot: ";
+			cin >> slot;
+
+			if (index != nullptr)
+				destroyIndex(index, indexCount);
+
+			if (cancelAppointment(w, day, slot))
+				cout << "OK CANCELLED d" << day << " s" << slot << endl;
+
+			break;
+		}
+		case 3: // PRINT_DAY
+		{
+			int day;
+			cout << "Enter Day (0-6): ";
+			cin >> day;
+
+			if (w.days == nullptr)
+			{
+				cout << "ERR WEEK_DESTROYED" << endl;
+			}
+			else if (day < 0 || day >= DAYS_IN_WEEK)
+			{
+				cout << "ERR BAD_DAY" << endl;
+			}
+			else
+			{
+				printDay(w.days[day], day);
+			}
+			break;
+		}
+		case 4: // PRINT_WEEK
+		{
+			printWeek(w);
+			break;
+		}
+		case 5: // MOVE
+		{
+			int fromDay, fromSlot, toDay;
+			cout << "Enter From Day (0-6): ";
+			cin >> fromDay;
+			cout << "Enter From Slot: ";
+			cin >> fromSlot;
+			cout << "Enter To Day (0-6): ";
+			cin >> toDay;
+
+			if (index != nullptr)
+				destroyIndex(index, indexCount);
+
+			if (moveAppointment(w, fromDay, fromSlot, toDay))
+				cout << "OK MOVED d" << fromDay << " s" << fromSlot << " -> d" << toDay << endl;
+
+			break;
+		}
+		case 6: // BUILD_INDEX
+		{
+			if (index != nullptr)
+				destroyIndex(index, indexCount);
+
+			index = buildIndex(w, indexCount);
+			cout << "OK INDEX_BUILT size=" << indexCount << endl;
+			break;
+		}
+		case 7: // PRINT_INDEX
+		{
+			printIndex(index, indexCount);
+			break;
+		}
+		case 8: // SORT_INDEX
+		{
+			sortIndexByPrice(index, indexCount);
+			cout << "OK INDEX_SORTED" << endl;
+			break;
+		}
+		case 9: // DROP_INDEX
+		{
+			destroyIndex(index, indexCount);
+			cout << "OK INDEX_DROPPED" << endl;
+			break;
+		}
+		case 10: // FIND
+		{
+			int clientId;
+			cout << "Enter Client ID: ";
+			cin >> clientId;
+
+			int foundDay, foundSlot;
+			Appointment* result = findAppointment(w, clientId, foundDay, foundSlot);
+
+			if (result == nullptr)
+			{
+				cout << "ERR NOT_FOUND" << endl;
+			}
+			else
+			{
+				cout << "OK FOUND "
+				     << (clientId < 10 ? "000" : clientId < 100 ? "00" : clientId < 1000 ? "0" : "")
+				     << clientId << " day=" << foundDay << " slot=" << foundSlot << " "
+				     << result->service << " PKR " << result->price << endl;
+			}
+			break;
+		}
+		case 11: // SEED
+		{
+			if (index != nullptr)
+				destroyIndex(index, indexCount);
+
+			loadSeedWeek(w);
+			cout << "OK SEED_LOADED" << endl;
+			break;
+		}
+		case 12: // BOOK_BYVAL
+		{
+			int day, clientId;
+			char name[30], service[30];
+			float price;
+
+			cout << "Enter Day (0-6): ";
+			cin >> day;
+			cout << "Enter Client ID: ";
+			cin >> clientId;
+			cout << "Enter Client Name: ";
+			cin >> name;
+			cout << "Enter Service: ";
+			cin >> service;
+			cout << "Enter Price: ";
+			cin >> price;
+
+			if (day < 0 || day >= DAYS_IN_WEEK)
+			{
+				cout << "ERR BAD_DAY" << endl;
+			}
+			else if (w.days == nullptr)
+			{
+				cout << "ERR WEEK_DESTROYED" << endl;
+			}
+			else
+			{
+				cout << "BYVAL pre count=" << w.days[day].count << " capacity=" << w.days[day].capacity << endl;
+				bool result = bookByValue(w.days[day], clientId, name, service, price);
+				cout << "BYVAL returned=" << (result ? 1 : 0) << endl;
+				cout << "BYVAL post count=" << w.days[day].count << " capacity=" << w.days[day].capacity << endl;
+			}
+			break;
+		}
+		case 13: // DESTROY_WEEK
+		{
+			if (index != nullptr)
+				destroyIndex(index, indexCount);
+
+			destroyWeek(w);
+			cout << "OK WEEK_DESTROYED" << endl;
+			break;
+		}
+		case 14: // UTILS
+		{
+			reportSizes();
+
+			float list[10];
+			fillPrices(list, list + 10, 10);
+
+			cout << "A2 LIST:";
+			for (int i = 0; i < 10; i++)
+				cout << " " << list[i];
+			cout << endl;
+
+			cout << "A2 SUM=" << sumRange(list, list + 10) << endl;
+
+			float* maxPtr = maxElementPtr(list, list + 10);
+			cout << "A2 MAX=" << *maxPtr << " OFF=" << (maxPtr - list) << endl;
+
+			cout << "A2 ABOVE=" << countAbove(list, list + 10, 1000.0f) << endl;
+
+			reverseInPlace(list, list + 10);
+			cout << "A2 REV:";
+			for (int i = 0; i < 10; i++)
+				cout << " " << list[i];
+			cout << endl;
+
+			break;
+		}
+		default:
+			cout << "ERR BAD_CMD" << endl;
+		}
+
+		system("pause");
+
+	} while (true);
+
+	if (index != nullptr)
+		destroyIndex(index, indexCount);
+	destroyWeek(w);
+	cout << "BYE" << endl;
+
+	return 0;
 }
 
 
