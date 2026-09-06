@@ -139,7 +139,7 @@ bool growFleet(Fleet& f)
 	{
 		newProbes[i] = nullptr;
 	}
-
+	// here the addressof probes are getting copied and which makes thing easier that's why we use double pointer here.
 	for (int i = 0; i < f.count; i++)
 	{
 		newProbes[i] = f.probes[i];
@@ -694,7 +694,7 @@ int main()
 			char sensor[30];
 			float value;
 			char status;
-			cout << "Enter ID of Sensor : ";
+			cout << "Enter ID of Probe : ";
 			cin >> id;
 			cout << "Enter name of Sensor: ";
 			cin >> sensor;
@@ -914,7 +914,7 @@ int main()
 		destroyProbe(clone);
 	destroyFleet(A);
 	destroyFleet(B);
-	cout << "BYE" << endl;
+	cout << "Thankyouuu " << endl;
 
 	return 0;
 }

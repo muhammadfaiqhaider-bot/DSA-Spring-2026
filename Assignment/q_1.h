@@ -1,3 +1,4 @@
+#pragma once
 #ifndef ROLL_N
 #define ROLL_N 3073
 #endif
@@ -27,7 +28,7 @@ struct Probe {
 	int readingCapacity;
 };
 struct Fleet {
-	Probe** probes;
+	Probe** probes; //fleet stores addresses to Probes rather than the Probes themselves
 	int count;
 	int capacity;
 };
