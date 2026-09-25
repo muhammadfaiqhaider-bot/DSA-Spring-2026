@@ -1,8 +1,12 @@
 #include <iostream>
 #include <string>
+#include "inputvalidator.h"
 using namespace std;
 
-void take_input();
+
+
+
+
 
 void take_input()
 {
@@ -11,7 +15,10 @@ void take_input()
 	getline(cin, exp);
 
 	cout << "Your Input:  " << endl;
-	cout << exp << endl;;
+	cout << exp << endl;
+
+	input_validator(exp);
+	
 }
 
 int main()
