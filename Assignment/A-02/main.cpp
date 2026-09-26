@@ -1,27 +1,16 @@
 #include <iostream>
-#include <string>
 #include "inputvalidator.h"
+#include <string>
+
 using namespace std;
 
 
 
-
-
-
-void take_input()
-{
-	string exp;
-	cout << "Enter the Expression/Input: ";
-	getline(cin, exp);
-
-	cout << "Your Input:  " << endl;
-	cout << exp << endl;
-
-	input_validator(exp);
-	
-}
-
 int main()
 {
-	take_input();
+	string inp = "2 1 20\nfunA(){funB} 5\nfunB(){} 7\nfunA";
+
+	input_validator(inp);
+
+	return 0;
 }
