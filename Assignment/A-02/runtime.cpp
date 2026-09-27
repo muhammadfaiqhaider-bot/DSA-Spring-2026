@@ -27,11 +27,12 @@ int stack_size(string inp)
 
 	i++;
 
-	while (inp[i] != '\0')
+	while (i < inp.length() && inp[i] != '\n')
 	{
 		s = s * 10 + (inp[i] - '0');
 		i++;
 	}
+
 	return s;
 }
 
@@ -132,5 +133,52 @@ void store_info_of_function_defi(Function* funcs, int n, string inp)
 
 
 
+Function* function_finder(Function* funcs, int n, string name)
+{
+	for (int i = 0; i < n; i++)
+	{
+		if (funcs[i].name == name)
+		{
+			return &funcs[i];
+		}
+	}
+
+	return nullptr;
+}
 
 
+
+
+
+void execute_function(string name, Function* funcs, int n, FrameStack& st, int recursion_left)
+{
+	Function* temp = function_finder(funcs, n, name);
+
+	Frame* fra = new Frame;
+
+	fra->memory = temp->memory;
+	fra->name = temp->name;
+
+	if (!st.memory_exceeded(fra->memory))
+	{
+		st.push(*fra);
+		cout << fra->name << " called " << endl;
+		cout << st.stack_memory << endl;
+
+		if (recursion_left > 1)
+		{
+			
+			execute_function(name, funcs, n, st, recursion_left - 1);
+		}
+
+		Frame temp_fra = st.pop();
+		cout << temp_fra.name << " finished" << endl;
+		cout << st.stack_memory << endl;
+	}
+	else
+	{
+		cout << "Sorry Memory Full Can't add your Function anymore (runtime error)" << endl;
+	}
+
+	delete fra;
+}

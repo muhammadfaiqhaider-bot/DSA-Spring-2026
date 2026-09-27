@@ -6,6 +6,7 @@ using namespace std;
 string infix_to_postix(string infix);
 int precedence(char ch);
 int is_operand(char ch);
+string value_extraction(string inp);
 
 struct Stack
 {

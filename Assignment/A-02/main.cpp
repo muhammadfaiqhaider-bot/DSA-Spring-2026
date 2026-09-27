@@ -8,13 +8,13 @@
 using namespace std;
 
 
-
 int main()
 {
-	string inp = "3 1 28\nfunA(3){funB} 5\nfunB(2){funC} 7\nfunC(){} 9\nfunA";
+	string inp = "3 2 28\nfunA(3){} 5\nfunB(){} 7\nfunC(){} 9\nfunA\nfunB";
 
 	int n = number_of_func_def(inp);
 	int s = stack_size(inp);
+	int m = number_of_topcall(inp);
 
 	int first_line_end = inp.find('\n');
 
@@ -24,22 +24,18 @@ int main()
 
 	store_info_of_function_defi(funcs, n, definitions);
 
-	for (int i = 0; i < n; i++)
+	string* top_calls = top_levelcalls(definitions);
+
+	FrameStack st(10, s);
+
+	for (int i = 0; i < m; i++)
 	{
-		cout << "Function: " << funcs[i].name << endl;
-		cout << "Recursion: " << funcs[i].recursion << endl;
-		cout << "Memory: " << funcs[i].memory << endl;
+		Function* temp = function_finder(funcs, n, top_calls[i]);
 
-		for (int j = 0; j < funcs[i].nested_count; j++)
-		{
-			cout << "Nested: " << funcs[i].nested[j] << endl;
-		}
-
-		cout << endl;
+		execute_function(top_calls[i], funcs, n, st, temp->recursion);
 	}
 
-	FrameStack st(s / 4, s);
-
+	delete[] top_calls;
 	delete[] funcs;
 
 	return 0;

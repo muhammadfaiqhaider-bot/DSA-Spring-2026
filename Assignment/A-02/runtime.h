@@ -95,3 +95,5 @@ int requested_memory(string inp);
 int memory_allignment(int req);
 int recursion_count(string inp);
 void store_info_of_function_defi(Function* funcs, int n, string inp);
+Function* function_finder(Function* funcs, int n, string name);
+void execute_function(string name, Function* funcs, int n, FrameStack& st, int recursion_left);
