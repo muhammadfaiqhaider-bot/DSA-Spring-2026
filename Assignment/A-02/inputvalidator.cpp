@@ -1,5 +1,8 @@
 #include <iostream>
 #include <string>
+#include"inputvalidator.h"
+#include"evaluator.h"
+#include"postfix.h"
 
 using namespace std;
 
@@ -334,39 +337,13 @@ int number_of_topcall(string inp)
 	return m;
 }
 
-int stack_size(string inp)
-{
-	int i = 0;
-	int s = 0;
 
-	while (inp[i] != ' ')
-	{
-		i++;
-	}
-
-	i++;
-
-	while (inp[i] != ' ')
-	{
-		i++;
-	}
-
-	i++;
-
-	while (inp[i] != '\0')
-	{
-		s = s * 10 + (inp[i] - '0');
-		i++;
-	}
-
-	return s;
-}
 
 void input_validator(string inp)
 {
 	int n = number_of_func_def(inp);
 	int m = number_of_topcall(inp);
-	int s = stack_size(inp);
+
 
 	int first_line_end = inp.find('\n');
 	string data = inp.substr(first_line_end + 1);

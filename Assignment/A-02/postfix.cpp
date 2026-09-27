@@ -1,10 +1,37 @@
 #include <iostream>
 #include <string>
-#include "postfix.h"
+#include"inputvalidator.h"
+#include"evaluator.h"
+#include"postfix.h"
+
 
 using namespace std;
 
 
+
+
+
+string value_extraction(string inp)
+{
+	int i = 1;
+	string value;
+
+	while (inp[i] != '\0')
+	{
+		if (inp[i - 1] == '(')
+		{
+			int j = i;
+			while (inp[j] != ')')
+			{
+				value += inp[j];
+				j++;
+			}
+			return value;
+		}
+		i++;
+	}
+	return "";
+}
 
 
 int is_operand(char ch)

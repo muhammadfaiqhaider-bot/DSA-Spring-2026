@@ -1,6 +1,9 @@
 #include <iostream>
 #include <string>
 #include "evaluator.h"
+#include "inputvalidator.h"
+#include "postfix.h"
+
 using namespace std;
 
 
