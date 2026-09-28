@@ -4,6 +4,7 @@
 using namespace std;
 
 
+
 struct Frame
 {
 	string name;
@@ -75,6 +76,7 @@ struct Function
 	int memory;
 	string* nested;
 	int nested_count;
+	string definition;
 
 	Function()
 	{
@@ -82,6 +84,7 @@ struct Function
 		memory = 0;
 		nested = nullptr;
 		nested_count = 0;
+		definition = "";
 	}
 
 	~Function()
@@ -90,10 +93,48 @@ struct Function
 	}
 };
 
+
+struct Statistics
+{
+	int total_calls;
+	int successful_calls;
+	int overflow_calls;
+	int max_depth;
+	int max_memory;
+	int* function_calls;
+
+	Statistics(int n)
+	{
+		total_calls = 0;
+		successful_calls = 0;
+		overflow_calls = 0;
+		max_depth = 0;
+		max_memory = 0;
+
+		function_calls = new int[n];
+
+		for (int i = 0; i < n; i++)
+		{
+			function_calls[i] = 0;
+		}
+	}
+
+	~Statistics()
+	{
+		delete[] function_calls;
+	}
+};
+
+
+
 int stack_size(string inp);
 int requested_memory(string inp);
 int memory_allignment(int req);
 int recursion_count(string inp);
 void store_info_of_function_defi(Function* funcs, int n, string inp);
 Function* function_finder(Function* funcs, int n, string name);
-void execute_function(string name, Function* funcs, int n, FrameStack& st, int recursion_left);
+void execute_function(string name, Function* funcs, int n, FrameStack& st, int recursion_left, Statistics& stat);
+string ternary_function(string inp);
+string ternary_selector(string inp);
+string* runtime_nested_collector(string inp);
+string most_frequent_function(Function* funcs, int n, Statistics& stat);

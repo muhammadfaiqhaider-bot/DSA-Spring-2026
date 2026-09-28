@@ -10,7 +10,7 @@ using namespace std;
 
 int main()
 {
-	string inp = "3 2 28\nfunA(3){} 5\nfunB(){} 7\nfunC(){} 9\nfunA\nfunB";
+	string inp = "4 1 20\nfunA(2){(true?funB:funC)} 5\nfunB(){} 7\nfunC(){} 9\nfunD(){} 4\nfunA";
 
 	int n = number_of_func_def(inp);
 	int s = stack_size(inp);
@@ -27,13 +27,32 @@ int main()
 	string* top_calls = top_levelcalls(definitions);
 
 	FrameStack st(10, s);
+	Statistics stat(n);
 
 	for (int i = 0; i < m; i++)
 	{
 		Function* temp = function_finder(funcs, n, top_calls[i]);
 
-		execute_function(top_calls[i], funcs, n, st, temp->recursion);
+		execute_function(top_calls[i], funcs, n, st, temp->recursion, stat);
 	}
+
+	cout << endl;
+
+	cout << "Total Calls: " << stat.total_calls << endl;
+	cout << "Successful Calls: " << stat.successful_calls << endl;
+	cout << "Overflow Calls: " << stat.overflow_calls << endl;
+	cout << "Maximum Stack Depth: " << stat.max_depth << endl;
+	cout << "Maximum Stack Memory: " << stat.max_memory << endl;
+
+	cout << "Function Calls:" << endl;
+
+	for (int i = 0; i < n; i++)
+	{
+		cout << funcs[i].name << " = " << stat.function_calls[i] << endl;
+	}
+
+	cout << "Most Frequent Function: "
+		<< most_frequent_function(funcs, n, stat) << endl;
 
 	delete[] top_calls;
 	delete[] funcs;
