@@ -351,3 +351,104 @@ string most_frequent_function(Function* funcs, int n, Statistics& stat)
 
 	return funcs[index].name;
 }
+
+
+
+
+string* test_case_collector(string inp)
+{
+	int i = 0;
+	int array_index = 0;
+
+	string* test_cases = new string[50];
+
+	while (i < inp.length())
+	{
+		int separator = inp.find("###", i);
+
+		if (separator == string::npos)
+		{
+			string temp = inp.substr(i);
+
+			if (temp.length() != 0)
+			{
+				test_cases[array_index] = temp;
+				array_index++;
+			}
+
+			break;
+		}
+
+		string temp = inp.substr(i, separator - i);
+
+		if (temp.length() != 0)
+		{
+			test_cases[array_index] = temp;
+			array_index++;
+		}
+
+		i = separator + 3;
+	}
+
+	return test_cases;
+}
+
+
+
+
+
+
+
+
+void run_valid_input(string inp)
+{
+	int n = number_of_func_def(inp);
+	int s = stack_size(inp);
+	int m = number_of_topcall(inp);
+
+	int first_line_end = inp.find('\n');
+
+	string definitions = inp.substr(first_line_end + 1);
+
+	Function* funcs = new Function[n];
+
+	store_info_of_function_defi(funcs, n, definitions);
+
+	string* top_calls = top_levelcalls(definitions);
+
+	FrameStack st(s / 4, s);
+	Statistics stat(n);
+
+	for (int i = 0; i < m; i++)
+	{
+		Function* temp = function_finder(funcs, n, top_calls[i]);
+
+		execute_function(top_calls[i], funcs, n, st, temp->recursion, stat);
+	}
+
+	cout << endl;
+
+	cout << "Total Calls: " << stat.total_calls << endl;
+	cout << "Successful Calls: " << stat.successful_calls << endl;
+	cout << "Overflow Calls: " << stat.overflow_calls << endl;
+	cout << "Maximum Stack Depth: " << stat.max_depth << endl;
+	cout << "Maximum Stack Memory: " << stat.max_memory << endl;
+
+	cout << "Function Calls:" << endl;
+
+	for (int i = 0; i < n; i++)
+	{
+		cout << funcs[i].name << " = "
+			<< stat.function_calls[i] << endl;
+	}
+
+	cout << "Most Frequent Function: "
+		<< most_frequent_function(funcs, n, stat) << endl;
+
+	delete[] top_calls;
+	delete[] funcs;
+}
+
+
+
+

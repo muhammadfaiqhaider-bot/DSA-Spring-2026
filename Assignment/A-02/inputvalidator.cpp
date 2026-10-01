@@ -3,6 +3,7 @@
 #include"inputvalidator.h"
 #include"evaluator.h"
 #include"postfix.h"
+#include"runtime.h"
 
 using namespace std;
 
@@ -339,7 +340,72 @@ int number_of_topcall(string inp)
 
 
 
-void input_validator(string inp)
+bool circular_dependency_helper(Function* funcs, int current, int n, int* state)
+{
+	state[current] = 1;
+
+	for (int i = 0; i < funcs[current].nested_count; i++)
+	{
+		Function* nested = function_finder(funcs, n, funcs[current].nested[i]);
+
+		if (nested == nullptr)
+		{
+			continue;
+		}
+
+		int next = nested - funcs;
+
+		if (state[next] == 1)
+		{
+			return true;
+		}
+
+		if (state[next] == 0)
+		{
+			if (circular_dependency_helper(funcs, next, n, state))
+			{
+				return true;
+			}
+		}
+	}
+
+	state[current] = 2;
+
+	return false;
+}
+
+bool circular_dependency(Function* funcs, int n)
+{
+	int* state = new int[n];
+
+	for (int i = 0; i < n; i++)
+	{
+		state[i] = 0;
+	}
+
+	for (int i = 0; i < n; i++)
+	{
+		if (state[i] == 0)
+		{
+			if (circular_dependency_helper(funcs, i, n, state))
+			{
+				delete[] state;
+				return true;
+			}
+		}
+	}
+
+	delete[] state;
+
+	return false;
+}
+
+
+
+
+
+
+bool input_validator(string inp)
 {
 	int n = number_of_func_def(inp);
 	int m = number_of_topcall(inp);
@@ -366,7 +432,19 @@ void input_validator(string inp)
 	bool dub_defi = !duplicate_defined_function(definitions, n);
 	bool undifined_nested = undefined_validator(definitions, n, nested_funcs);
 	bool undifened_top = undefined_top_level_call(definitions, n, top_calls, m);
-	bool circular_dep = false;//i ll implement late....
+
+	bool circular_dep = false;
+
+	if (valid_name == true && dub_defi == false && undifined_nested == false && undifened_top == false)
+	{
+		Function* funcs = new Function[n];
+
+		store_info_of_function_defi(funcs, n, data);
+
+		circular_dep = circular_dependency(funcs, n);
+
+		delete[] funcs;
+	}
 
 
 	if (!valid_name)
@@ -393,16 +471,19 @@ void input_validator(string inp)
 	}
 
 
-	if (valid_name == false || dub_defi == true || undifined_nested == true || undifened_top == true)
+	if (valid_name == false || dub_defi == true || undifined_nested == true || undifened_top == true || circular_dep == true)
 	{
 		delete[] definitions;
 		delete[] nested_funcs;
 		delete[] top_calls;
-		return;
+		return false;
 	}
-	 
-	cout << "Everything is fine you may proceed to more work ..." << endl;
+
 	delete[] definitions;
 	delete[] nested_funcs;
 	delete[] top_calls;
+
+	return true;
 }
+
+

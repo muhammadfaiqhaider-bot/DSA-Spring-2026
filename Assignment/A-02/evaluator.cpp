@@ -3,6 +3,7 @@
 #include "evaluator.h"
 #include "inputvalidator.h"
 #include "postfix.h"
+#include "runtime.h"
 
 using namespace std;
 

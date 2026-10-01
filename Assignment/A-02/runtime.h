@@ -138,3 +138,6 @@ string ternary_function(string inp);
 string ternary_selector(string inp);
 string* runtime_nested_collector(string inp);
 string most_frequent_function(Function* funcs, int n, Statistics& stat);
+string* test_case_collector(string inp);
+void run_valid_input(string inp);
+void process_file_input();
