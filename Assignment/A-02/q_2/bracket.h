@@ -82,3 +82,12 @@ struct bracketStack
 };
 
 
+char expected_bracket(char ch);
+bool valid_paranthesis(string inp);
+void analyze_source_code(string inp);
+string* test_case_collector(string inp);
+string file_input();
+void process_file();
+string manual_input();
+void process_manual_input();
+void menu();

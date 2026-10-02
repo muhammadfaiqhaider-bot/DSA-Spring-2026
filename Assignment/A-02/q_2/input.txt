@@ -1,0 +1,64 @@
+int main() {
+    string x = "[not a bracket] { } ( )";
+    char c = '}';
+    char d = '\'';
+    // ignore these brackets: } ] ) { [ (
+    /* ignore these too: [ { ( } ] )
+       and this is another line */
+    if (arr[2] > 0) {
+        cout << "He said \"Hello [world]\"";
+    }
+}
+###
+int main() {
+    if (arr[2} > 0) {
+        return 0;
+    }
+}
+###
+int main() {
+    int x = 10;
+}
+]
+###
+int main() {
+    int x = arr[2;
+}
+###
+string x = "Hello [world] {test} (abc)";
+string y = "He said \"Hello [world]\"";
+int main() {
+    cout << x;
+}
+###
+int main() {
+    char a = '}';
+    char b = ']';
+    char c = '\'';
+    // } ] ) [ {
+    /* 
+       { [ ( 
+       ) ] }
+    */
+    if (x) {
+    }
+}
+###
+#define ACCESS(x) ((x)[0])
+#define TEST(x) ({x})
+int main() {
+    int x = arr[2];
+    if (x > 0) {
+    }
+}
+###
+int main() {
+
+
+    string x = "# [hello] {world}";
+    /* comment starts
+       and continues
+       until here */
+    if (x[2]) {
+    }
+}

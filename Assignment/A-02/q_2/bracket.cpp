@@ -2,7 +2,13 @@
 #include <iostream>
 #include <string>
 #include "bracket.h"
+#include <fstream>
 using namespace std;
+
+
+
+string manual_input();
+
 
 
 char expected_bracket(char ch)
@@ -17,164 +23,388 @@ char expected_bracket(char ch)
 	return '\0';
 }
 
-
-
-bool valid_paranthesis(string inp)
+void analyze_source_code(string inp)
 {
-	bracketStack st(10);
+	const int original = 0;
+	const int str = 1;
+	const int charcters = 2;
+	const int singlecomment = 3;
+	const int multicomment = 4;
+
 	int i = 0;
-	int j = 1;
 	int line = 1;
+	int column = 1;
+
+	int sta = original;
+
+
+	bool first_non_space = true;
+	bool preprocessor = false;
+
+	bracketStack st(inp.length() + 1);
+
 	int max_depth = 0;
 	int match_pairs = 0;
 
 	while (i < inp.length())
 	{
-		if (inp[i] == '\n')
+		if (sta == original)
 		{
-			j = 1;
-			line++;
-			i++;
-			continue;
-		}
-
-		if (inp[i] == '(' || inp[i] == '{' || inp[i] == '[')
-		{
-			st.push(inp[i], line, j);
-			if (st.top + 1 > max_depth)
-				max_depth = st.top + 1;
-		}
-
-
-		else if (inp[i] == ')' || inp[i] == '}' || inp[i] == ']')
-		{
-			if (st.is_empty())
+			if (preprocessor == true)
 			{
-				cout << "Invalid " << endl;
-				cout << "error bcz at line " << line << " and column " << j
-					<< " i found " << inp[i] << " but there was no opening bracket" << endl;
-				return false;
-			}
-
-			if ((st.peek() == '(' && inp[i] == ')') ||
-				(st.peek() == '{' && inp[i] == '}') ||
-				(st.peek() == '[' && inp[i] == ']'))
-			{
-				st.pop();
-				match_pairs++;
+				if (inp[i] == '\n')
+				{
+					preprocessor = false;
+					first_non_space = true;
+				}
 			}
 			else
 			{
-				cout << "Invalid " << endl;
-				cout << "error bcz at line " << line << " and column " << j
-					<< " i found " << inp[i]
-					<< " but i expect " << expected_bracket(st.peek()) << endl;
-				return false;
+				if (first_non_space == true)
+				{
+					if (inp[i] == ' ' || inp[i] == '\t')
+					{
+
+					}
+					else
+					{
+						first_non_space = false;
+
+						if (inp[i] == '#')
+						{
+							preprocessor = true;
+						}
+					}
+				}
+
+				if (preprocessor == false)
+				{
+					if (inp[i] == '"')
+					{
+						sta = str;
+					}
+					else if (inp[i] == '\'')
+					{
+						sta = charcters;
+					}
+					else if (inp[i] == '/' && i + 1 < inp.length() && inp[i + 1] == '/')
+					{
+						sta = singlecomment;
+						i++;
+						column++;
+					}
+					else if (inp[i] == '/' && i + 1 < inp.length() && inp[i + 1] == '*')
+					{
+						sta = multicomment;
+						i++;
+						column++;
+					}
+					else if (inp[i] == '(' || inp[i] == '{' || inp[i] == '[')
+					{
+						st.push(inp[i], line, column);
+
+						if (st.top + 1 > max_depth)
+							max_depth = st.top + 1;
+					}
+					else if (inp[i] == ')' || inp[i] == '}' || inp[i] == ']')
+					{
+						if (st.is_empty())
+						{
+							cout << "Invalid" << endl;
+							cout << "Error at Line " << line
+								<< ", Column " << column
+								<< ": Unexpected '" << inp[i] << "'" << endl;
+
+							return;
+						}
+
+						if ((st.peek() == '(' && inp[i] == ')') ||
+							(st.peek() == '{' && inp[i] == '}') ||
+							(st.peek() == '[' && inp[i] == ']'))
+						{
+							st.pop();
+							match_pairs++;
+						}
+						else
+						{
+							cout << "Invalid" << endl;
+							cout << "Error at Line " << line
+								<< ", Column " << column
+								<< ": Expected '" << expected_bracket(st.peek())
+								<< "' but found '" << inp[i] << "'" << endl;
+
+							return;
+						}
+					}
+				}
 			}
 		}
 
+		else if (sta == str)
+		{
+			if (inp[i] == '\\')
+			{
+				if (i + 1 < inp.length())
+				{
+					i++;
+					column++;
+				}
+			}
+			else if (inp[i] == '"')
+			{
+				sta = original;
+			}
+		}
+
+		else if (sta == charcters)
+		{
+			if (inp[i] == '\\')
+			{
+				if (i + 1 < inp.length())
+				{
+					i++;
+					column++;
+				}
+			}
+			else if (inp[i] == '\'')
+			{
+				sta = original;
+			}
+		}
+
+		else if (sta == singlecomment)
+		{
+			if (inp[i] == '\n')
+			{
+				sta = original;
+				first_non_space = true;
+			}
+		}
+
+		else if (sta == multicomment)
+		{
+			if (inp[i] == '*' && i + 1 < inp.length() && inp[i + 1] == '/')
+			{
+				sta = original;
+				i++;
+				column++;
+			}
+		}
+
+		// remaining essential stuff for moving through input..
+		if (inp[i] == '\n')
+		{
+			line++;
+			column = 1;
+			first_non_space = true;
+			preprocessor = false;
+		}
+		else
+		{
+			column++;
+		}
+
 		i++;
-		j++;
 	}
 
 	if (!st.is_empty())
 	{
 		bracket temp = st.peek_frame();
 
-		cout << "Invalid " << endl;
-		cout << "Error bcz " << temp.bracket
-			<< " was opened at line " << temp.line
-			<< " and column " << temp.column
-			<< " but never closed" << endl;
+		cout << "Invalid" << endl;
+		cout << "Error: '" << temp.bracket
+			<< "' opened at Line " << temp.line
+			<< ", Column " << temp.column
+			<< " was never closed" << endl;
 
-		return false;
+		return;
 	}
 
 	cout << "Valid" << endl;
 	cout << "Maximum Nesting Depth: " << max_depth << endl;
 	cout << "Total Matched Pairs: " << match_pairs << endl;
-	return true;
 }
 
 
 
-void analyze_source_code(string inp)
+
+
+
+
+string* test_case_collector(string inp)
 {
-
-	const int original = 0;
-	const int str = 1;
-	const int charcters = 2;
-	const int singlecomment = 3;
-	const int multicomment = 4;
 	int i = 0;
-	
-	int sta = original;
+	int array_index = 0;
 
-	while (inp[i] != '\0')
+	string* test_cases = new string[50];
+
+	for (int k = 0; k < 50; k++)
 	{
-		if (inp[i] == (char)(34)) // ascii code for " = 34
+		test_cases[k] = "";
+	}
+
+	while (i < inp.length())
+	{
+		int line_end = i;
+
+		while (line_end < inp.length() && inp[line_end] != '\n')
 		{
-			sta = str;
-			int j = i;
-			while (inp[j] != (char)(34))
-			{
-				j++;
-			}
-			i = j;
+			line_end++;
 		}
-		else if (inp[i] == (char)(39)) // ascci code for ' = 39
+
+		string line = inp.substr(i, line_end - i);
+
+		if (line == "###" || line == "###\r")
 		{
-			sta = charcters;
-			int j = i;
-			while (inp[j] != (char)(39))
-			{
-				j++;
-			}
-			i = j;
+			array_index++;
 		}
-		
-		else if (inp[i] == (char)(47) && inp[i + 1] == (char)(47)) // ascci code for / = 47
-		{
-			sta = singlecomment;
-			int j = i;
-			while (inp[j] != (char)(47))
-			{
-				j++;
-			}
-			i = j;
-		}
-		else if (inp[i] == (char)(47) && inp[i + 1] == (char)(42)) // ascci code for * = 42
-		{
-			sta = multicomment;
-			int j = i;
-			while (inp[j] != (char)(47))
-			{
-				j++;
-			}
-			i = j;
-		}
-		
 		else
 		{
-			sta == original;
+			if (test_cases[array_index].length() != 0)
+				test_cases[array_index] += "\n";
+
+			test_cases[array_index] += line;
 		}
-		i++;
+
+		i = line_end + 1;
 	}
+
+	return test_cases;
 }
 
 
 
-int main()
+
+
+string file_input()
 {
-	if (valid_paranthesis("{[()]}"))
+	string filename;
+	string inp = "";
+	string line;
+
+	cout << "Enter file name: ";
+	getline(cin, filename);
+
+	ifstream file(filename);
+
+	if (!file)
 	{
-		cout << "valid " << endl;
+		cout << "Unable to open file." << endl;
+		return "";
+	}
+
+	while (getline(file, line))
+	{
+		inp += line;
+		inp += "\n";
+	}
+
+	file.close();
+
+	return inp;
+}
+
+
+
+
+
+
+
+
+void process_file()
+{
+	string inp = file_input();
+
+	if (inp.length() == 0)
+	{
+		return;
+	}
+
+	string* test_cases = test_case_collector(inp);
+	cout << endl << endl;;
+	for (int i = 0; test_cases[i].length() != 0; i++)
+	{
+		cout << "        Test Case " << i + 1  << endl;
+
+		analyze_source_code(test_cases[i]);
+
+		cout << endl;
+	}
+
+	delete[] test_cases;
+}
+
+
+
+void process_manual_input()
+{
+	string inp = manual_input();
+
+	cout << endl;
+	cout << "Checking input..." << endl;
+
+	analyze_source_code(inp);
+}
+
+
+
+
+
+string manual_input()
+{
+	string inp = "";
+	string line;
+
+	cout << "Enter your source code." << endl;
+	cout << "Enter ### when you are finished." << endl;
+
+	while (true)
+	{
+		getline(cin, line);
+
+		if (line == "###")
+		{
+			break;
+		}
+
+		inp += line;
+		inp += "\n";
+	}
+
+	return inp;
+}
+
+
+
+void menu()
+{
+	int choice;
+
+	cout << "Press 1 for Manual Input" << endl;
+	cout << "Press 2 for File Input" << endl;
+	cout << "Enter your choice: ";
+
+	cin >> choice;
+	cin.ignore(1000, '\n');
+
+	if (choice == 1)
+	{
+		process_manual_input();
+	}
+	else if (choice == 2)
+	{
+		process_file();
 	}
 	else
 	{
-		cout << "Nopsies" << endl;
+		cout << "Invalid choice." << endl;
 	}
-
-	return 0;
 }
+
+
+
+
+
+
+
 
